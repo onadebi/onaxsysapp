@@ -1,52 +1,40 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
 using AppCore.Domain.AppCore.Models.Extensions;
 
 namespace AppCore.Domain.Blog.Entities;
 
-[Table(nameof(Posts))]
+[Table(nameof(Posts), Schema = "Blog")]
 // [BsonIgnoreExtraElements]
 public class Posts : CommonProperties
 {
-    [BsonId]
-    [BsonRepresentation(BsonType.ObjectId)]
-    public required string Id { get; set; }
+    [Key]
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public Guid PostId { get; set; } = Guid.NewGuid();
 
-    [BsonRequired]
-    [BsonElement(nameof(Title))]
+    [Required]
     public required string Title { get; set; }
 
-    [BsonRequired]
-    [BsonElement(nameof(Content))]
+    [Required]
     public required string Content { get; set; }
 
-    [BsonElement(nameof(SlugUrl))]
-    public string SlugUrl { get; set; }
+    public required string SlugUrl { get; set; }
 
-    //[BsonRequired]
-    [BsonElement(nameof(ContentExcerpt))]
+    //[Required]
     public required string ContentExcerpt { get; set; }
 
-    [BsonRequired]
-    [BsonElement(nameof(PostedBy))]
+    [Required]
     public required Guid PostedBy { get; set; }
 
-    [BsonElement(nameof(FeaturedImageUrl))]
     public Images? FeaturedImageUrl { get; set; }
 
-    [BsonElement(nameof(CloudTags))]
-    public List<string>? CloudTags { get; set; }
+    // public List<string>? CloudTags { get; set; }
 
-    [BsonElement(nameof(Likes))]
-    public HashSet<Guid>? Likes { get; set; }
+    // public HashSet<Guid>? Likes { get; set; }
 
-    [BsonElement(nameof(Comments))]
-    public List<PostComments> Comments { get; set; } = new();
+    // public List<PostComments> Comments { get; set; } = new();
 
-    [BsonRequired]
-    [BsonElement(nameof(Categories))]
+    [Required]
     public List<string> Categories { get; set; } = new();
 }
 

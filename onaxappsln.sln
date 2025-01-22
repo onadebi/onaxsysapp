@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OnaxApp", "OnaxApp\OnaxApp.csproj", "{4D7CAE9D-7426-40FF-96E1-DE242EA2092B}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppGlobal", "AppGlobal\AppGlobal.csproj", "{8DDE9602-BCEE-43C7-B2AE-044C154627C0}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AppTest", "AppTest\AppTest.csproj", "{DA0D1A4A-8448-40E7-A429-1C2A0CAF4165}"
@@ -24,10 +22,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{4D7CAE9D-7426-40FF-96E1-DE242EA2092B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{4D7CAE9D-7426-40FF-96E1-DE242EA2092B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{4D7CAE9D-7426-40FF-96E1-DE242EA2092B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{4D7CAE9D-7426-40FF-96E1-DE242EA2092B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8DDE9602-BCEE-43C7-B2AE-044C154627C0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8DDE9602-BCEE-43C7-B2AE-044C154627C0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8DDE9602-BCEE-43C7-B2AE-044C154627C0}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -44,10 +38,6 @@ Global
 		{90DCC36B-7DAF-43E3-81FD-076593C27E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90DCC36B-7DAF-43E3-81FD-076593C27E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90DCC36B-7DAF-43E3-81FD-076593C27E74}.Release|Any CPU.Build.0 = Release|Any CPU
-		{133CB404-0153-4F8E-82A7-9E8C465F52D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{133CB404-0153-4F8E-82A7-9E8C465F52D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{133CB404-0153-4F8E-82A7-9E8C465F52D2}.Release|Any CPU.ActiveCfg = Debug|Any CPU
-		{133CB404-0153-4F8E-82A7-9E8C465F52D2}.Release|Any CPU.Build.0 = Debug|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

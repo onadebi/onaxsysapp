@@ -1,4 +1,5 @@
 using AppCore.Domain.AppCore.Models;
+using AppCore.Domain.Blog.Entities;
 using AppCore.Persistence.ModelBuilders;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -18,6 +19,11 @@ public class AppDbContext: DbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
         modelBuilder.SeedBuilder();
     }
+
+    #region BLOG
+    public DbSet<PostCategory> PostCategories{ get; set; }
+
+    #endregion
     //public DbSet<MessageBox> MessageBoxz { get; set; }
     public DbSet<UserProfile> UserProfiles{ get; set; }
     public DbSet<UserApp> UserApps { get; set; }
