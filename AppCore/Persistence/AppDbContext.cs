@@ -1,0 +1,28 @@
+using AppCore.Domain.AppCore.Models;
+using AppCore.Persistence.ModelBuilders;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace AppCore.Persistence;
+
+public class AppDbContext: DbContext
+{
+    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    {
+    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
+        modelBuilder.SeedBuilder();
+    }
+    //public DbSet<MessageBox> MessageBoxz { get; set; }
+    public DbSet<UserProfile> UserProfiles{ get; set; }
+    public DbSet<UserApp> UserApps { get; set; }
+    public DbSet<UserRole> UserRoles { get; set; }
+
+    public DbSet<AppDocuments> AppDocumentz { get; set; }
+    public DbSet<UserDocument> UserDocuments { get; set; }
+}

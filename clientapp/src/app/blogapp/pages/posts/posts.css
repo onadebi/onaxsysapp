@@ -1,0 +1,9 @@
+.stickyPoint{
+    position: sticky;
+    top: 8px;
+}
+
+
+.ql-container, .ql-toolbar.ql-snow {
+    border: none !important;
+}
