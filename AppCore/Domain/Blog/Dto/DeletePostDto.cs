@@ -6,6 +6,6 @@ namespace AppCore.Domain.Blog.Dto
     {
         [Required]
         [MaxLength(50)]
-        public string Id { get; set; }
+        public required string Id { get; set; }
     }
 }

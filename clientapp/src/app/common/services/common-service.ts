@@ -64,7 +64,7 @@ export default class CommonService {
         for (const cookie of cookieArr) {
             const [key, value] = cookie.split("=");
             if (key === userSession) {
-                decoded = ""; //atob(value);
+                decoded = atob(value);
                 const authProfile = decoded as unknown as AuthProfile;
                 return authProfile;//JSON.parse(authProfile);
             }

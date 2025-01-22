@@ -12,7 +12,7 @@ namespace AppCore.Domain.Blog.Dto
         [Required]
         [MaxLength(2500)]
         public required string Content { get; set; }
-        public Images FeaturedImageUrl { get; set; }
+        public Images? FeaturedImageUrl { get; set; }
         public List<string> CloudTags { get; set; } =[];
         public List<string> Categories { get; set; } = new();
     }

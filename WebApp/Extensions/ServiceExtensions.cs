@@ -139,7 +139,7 @@ public static class ServiceExtensions
             byte[] key = Array.Empty<byte>();
             if (builder.Environment.IsDevelopment())
             {
-                key = Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("AppSettings:Encryption:Key"));
+                key = Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("AppSettings:Encryption:Key") ?? "");
             }
             else
             {
@@ -162,7 +162,7 @@ public static class ServiceExtensions
                 OnMessageReceived = context =>
                 {
                     string tokenLocation = $"{nameof(AppSettings)}:{nameof(AppSettings.SessionConfig)}:{nameof(SessionConfig.Auth)}:{nameof(SessionConfig.Auth.token)}";
-                    string tokenName = builder.Configuration.GetValue<string>(tokenLocation);
+                    string tokenName = builder.Configuration.GetValue<string>(tokenLocation) ?? "token";
                     context.Token = context.Request.Cookies[key: tokenName];
                     #region USe Bearer Token in the absence of Cookie auth
                     if (context.Token == null)

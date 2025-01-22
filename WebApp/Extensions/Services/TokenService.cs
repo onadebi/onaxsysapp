@@ -61,10 +61,10 @@ public class TokenService
         try
         {
             var authHeader = context.Request.Headers.Authorization.FirstOrDefault(m => m != null && m.StartsWith("Bearer"));
-            context.Request.Cookies.TryGetValue(_sessionConfig.Auth.token, out string cookieValue);
+            context.Request.Cookies.TryGetValue(_sessionConfig.Auth.token, out string? cookieValue);
             if (authHeader != null || !string.IsNullOrWhiteSpace(cookieValue))
             {
-                string authToken = !string.IsNullOrWhiteSpace(cookieValue) ? cookieValue : authHeader.Split(" ")[1];
+                string authToken = !string.IsNullOrWhiteSpace(cookieValue) ? cookieValue : authHeader!.Split(" ")[1];
                 //TODO: Delete below
                 var eventual = GetUserClaims(authToken);
                 var jwtTokenHandler = new JwtSecurityTokenHandler();
@@ -104,7 +104,7 @@ public class TokenService
                             Guid = tokenValues["guid"],
                             Id = Convert.ToInt64(tokenValues["Id"]),
                         };
-                        tokenValues.TryGetValue("role", out string userRoles);
+                        tokenValues.TryGetValue("role", out string? userRoles);
                         appUser.Roles = !string.IsNullOrWhiteSpace(userRoles) ? userRoles.Split(',').ToList<string>() : new List<string>();
                         objResp = GenResponse<AppUserIdentity>.Success(appUser);
                         #region Sliding Expiration 
@@ -118,7 +118,7 @@ public class TokenService
                             {
                                 var prolongedToken = this.CreateToken(objResp.Result, _sessionConfig.Auth.ExpireMinutes);
                                 context.Response.Headers.Remove("Set-Authorization");
-                                context.Response.Headers.Add("Set-Authorization", prolongedToken);
+                                context.Response.Headers.Append("Set-Authorization", prolongedToken);
 
                                 context.Response.Cookies.Append(_sessionConfig.Auth.token, prolongedToken, new CookieOptions()
                                 {
@@ -195,7 +195,7 @@ public class TokenService
                     Guid = tokenValues["guid"],
                     Id = Convert.ToInt64(tokenValues["Id"]),
                 };
-                tokenValues.TryGetValue("role", out string userRoles);
+                tokenValues.TryGetValue("role", out string? userRoles);
                 appUser.Roles = !string.IsNullOrWhiteSpace(userRoles) ? userRoles.Split(',').ToList<string>() : new List<string>();
                 return GenResponse<AppUserIdentity>.Success(appUser);
             }

@@ -1,5 +1,6 @@
 using AppCore.Domain.AppCore.Enums;
 using AppCore.Domain.AppCore.Models;
+using AppCore.Domain.Blog.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace AppCore.Persistence.ModelBuilders;
@@ -19,7 +20,7 @@ public static class AppFluentBuilder
             prop.HasIndex(m => m.Username, "ix_UserProfile_Usernname_Unique").IsUnique();
         });
 
-        
+
 
         //model.Entity<UserRole>(prop =>
         //{
@@ -35,6 +36,8 @@ public static class AppFluentBuilder
         {
             prop.HasMany<UserApp>(u => u.UserProfileUserApps).WithOne(p => p.UserProfile).HasForeignKey(f => f.UserId).OnDelete(DeleteBehavior.Cascade);
         });
+
+
         model.Entity<AppDocuments>(prop =>
         {
             prop.HasMany<UserDocument>(u => u.UserAppDocument).WithOne(p => p.AppUserDocuments).HasForeignKey(f => f.AppDocumentId).OnDelete(DeleteBehavior.NoAction);
@@ -43,6 +46,13 @@ public static class AppFluentBuilder
         {
             prop.HasIndex(u => new { u.UserProfileId, u.AppDocumentId }, name: "ix_UserDocument_UserProfileIdAppDocumentId_CompositeUniqueIndex").IsUnique();
         });
+
+        #region BLOG
+        model.Entity<PostCategory>(prop =>
+        {
+            prop.HasIndex(m => m.Title, name: "ix_unique_postcategory_title").IsUnique();
+        });
+        #endregion
 
         #region Populate database tables
 

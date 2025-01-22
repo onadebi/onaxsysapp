@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Extensions.FileProviders;
 using WebApp.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -46,6 +47,16 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 
+#region Static frontend serving
+app.UseDefaultFiles(); // Serve the index.html file by default
+string currentDir = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "portal");
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(currentDir),
+    RequestPath = ""
+});
+#endregion
+
 app.Use(async (context, next) =>
 {
     var req = context.Request;
@@ -62,5 +73,5 @@ app.Use(async (context, next) =>
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
+ app.MapFallbackToController("Index", "Zone");
 app.Run();

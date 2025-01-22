@@ -7,7 +7,7 @@ namespace AppCore.Domain.Blog.Dto
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public required string Id { get; set; }
 
        
     }
@@ -16,9 +16,9 @@ namespace AppCore.Domain.Blog.Dto
     {
         [BsonRequired]
         [BsonElement(nameof(Title))]
-        public string Title { get; set; }
+        public required string Title { get; set; }
 
         [BsonElement(nameof(Description))]
-        public string Description { get; set; }
+        public string? Description { get; set; }
     }
 }
