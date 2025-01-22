@@ -1,0 +1,29 @@
+networks:
+  onaxsysnet:
+    driver: bridge
+
+services:
+  onaxsyswebapp:
+    image: onaxsys-webapp
+    container_name: onaxsys_webapp
+    build:
+      context: .
+      dockerfile: WebApp/Dockerfile
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ClerkPublishableKey=${ClerkPublishableKey}
+      - EncryptionKeyEnvVar=${EncryptionKeyEnvVar}
+      - DBConString_obs=${DBConString_obs}
+      - DBConString=${DBConString}
+      - RedisConstring=${RedisConstring}
+      - GeminiApiKeyEnv=${GeminiApiKeyEnv}
+      - YoutubeApiKeyEnv=${YoutubeApiKeyEnv}
+      - BlobStorageConstring=${BlobStorageConstring}
+      - BlobReadAccessYear2099=${BlobReadAccessYear2099}
+      - BlobStoragePath=${BlobStoragePath}
+    ports:
+        - "5000:80"
+        - "5001:443" 
+        - "5050:8080" 
+    networks:
+        - onaxsysnet

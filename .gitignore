@@ -15,6 +15,7 @@
 .vscode
 OnaxApp
 WebApp/wwwroot/portal
+docker-compose.override.yml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
