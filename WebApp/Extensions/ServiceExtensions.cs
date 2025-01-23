@@ -4,18 +4,14 @@ using AppGlobal.Config;
 using AppGlobal.Services.Common.DbAccess;
 using AppGlobal.Services.DbAccess;
 using AppGlobal.Services;
-using Microsoft.AspNetCore.DataProtection.Repositories;
-using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using OnaxTools.Services.StackExchangeRedis.Interface;
 using WebApp.Helpers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using MongoDB.Driver;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
-using StackExchange.Redis;
 
 namespace WebApp.Extensions;
 
@@ -26,7 +22,7 @@ public static class ServiceExtensions
         string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKey", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
         string RedisConfig = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("RedisConstring") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("RedisConstring")!;
         string MongoDbCon = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("MongoDbConnect") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("MongoDbConnect")!;
-        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=aws-0-ca-central-1.pooler.supabase.com;Port=5432;Database=onaxsysdb;Timeout=30;User Id=postgres.uiebbzudupicqznronck;Password=SHiD9v$pc!5GUtu;Include Error Detail=true";
+        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=aws-0-ca-central-1.pooler.supabase.com;Port=5432;Database=onaxsys;Timeout=30;User Id=postgres.uiebbzudupicqznronck;Password=SHiD9v$pc!5GUtu;Include Error Detail=true";
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
         services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(AppSettings)));

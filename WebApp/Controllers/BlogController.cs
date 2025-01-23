@@ -1,23 +1,20 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OnaxTools.Dto.Http;
-using OnaxTools.Enums.Http;
 
-namespace WebApp.Controllers;
-
-[ApiController]
-[Route("api/[controller]")]
-[AllowAnonymous]
-public class BlogController : ControllerBase
+namespace WebApp.Controllers
 {
-    [HttpGet("categories")]
-    public IActionResult GetCategories()
+    [AllowAnonymous]
+    [Route("zone/blog")]
+    public class BlogController : Controller
     {
-        var categories = new List<string> { "Technology", "Health", "Travel", "Food" };
-        return Ok(GenResponse<List<string>>.Success(categories,StatusCodeEnum.OK));
+
+        public BlogController()
+        {
+            
+        }
+        public IActionResult Index()
+        {
+            return View(nameof(Index));
+        }
     }
 }
