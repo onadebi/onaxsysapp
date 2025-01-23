@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppCore.Domain.AppCore.Models
 {
-    [Table(nameof(UserApp), Schema = "profile")]
+    [Table(nameof(UserApp), Schema = "auth")]
     public class UserApp: CommonProperties
     {
         [Key]

@@ -14,6 +14,8 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using MongoDB.Driver;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace WebApp.Extensions;
 
@@ -22,9 +24,9 @@ public static class ServiceExtensions
     public static IServiceCollection AddCustomServiceCollections(this IServiceCollection services, WebApplicationBuilder builder)
     {
         string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKey", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
-        string RedisConfig = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("RedisCon") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("RedisCon")!;
+        string RedisConfig = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("RedisConstring") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("RedisConstring")!;
         string MongoDbCon = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("MongoDbConnect") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("MongoDbConnect")!;
-        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("Default") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("Default")!;
+        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=aws-0-ca-central-1.pooler.supabase.com;Port=5432;Database=onaxsysdb;Timeout=30;User Id=postgres.uiebbzudupicqznronck;Password=SHiD9v$pc!5GUtu;Include Error Detail=true";
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
         services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(AppSettings)));
@@ -43,73 +45,48 @@ public static class ServiceExtensions
         //});
         services.AddSingleton<IMongoDataAccess>((svcProvider) => new MongoDataAccess(MongoDbCon, "onasonic"));
 
-        //services.AddDbContext<AppDbContext>(options =>
-        //    options.UseNpgsql(dbConstring, options => options.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds))
-        //    .UseLoggerFactory(LoggerFactory.Create(buildr =>
-        //    {
-        //        if (builder.Environment.IsDevelopment())
-        //        {
-        //            buildr.AddDebug();
-        //        }
-        //    }))
-        //    );
+        services.AddDbContext<AppDbContext>(options =>
+            options.UseNpgsql(dbConstring, options => options.CommandTimeout((int)TimeSpan.FromMinutes(10).TotalSeconds))
+            .UseLoggerFactory(LoggerFactory.Create(buildr =>
+            {
+                if (builder.Environment.IsDevelopment())
+                {
+                    buildr.AddDebug();
+                }
+            }))
+            );
 
         //services.AddHangfire(x => x.UsePostgreSqlStorage(dbConstring));
         //services.AddHangfireServer();
 
-        services.AddScoped<ICacheService>((provider) => {
-            var appSettings = provider.GetRequiredService<IOptions<AppSettings>>();
-            //var inMemCache = provider.GetRequiredService<IMemoryCache>();
+        #region REMOVE CACHE FROM IMPACTING STARTUP
+        services.AddScoped<ICacheService>((svcProvider) =>
+        {
+            var appSettings = svcProvider.GetRequiredService<IOptions<AppSettings>>();
+            //var inMemCache = svcProvider.GetRequiredService<IMemoryCache>();
             //return new CacheService(RedisConfig, appSettings.Value.AppKey, inMemCache);
-            var cxnMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(RedisConfig);
+            var cxnMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(RedisConfig ?? "");
             return new CacheService(appSettings, cxnMultiplexer);
         });
         // Add in-memory cache [As fallback plan]
         services.AddMemoryCache();
-        #region REMOVE CACHE FROM IMPACTING STARTUP
-        //try
-        //{
-        //    services.AddScoped<ICacheService>((svcProvider) =>
-        //    {
-        //        var cxnMultiplexer = StackExchange.Redis.ConnectionMultiplexer.Connect(RedisConfig);
-        //        var appSettings = svcProvider.GetRequiredService<IOptions<AppSettings>>();
-        //        return new CacheService(cxnMultiplexer, appSettings.Value.AppKey);
-        //    });
-        //}
-        //catch(RedisConnectionException ex)
-        //{
-        //    // Handle Redis connection exception
-        //    // For example, log the exception and provide a default cache service
-        //    OnaxTools.Logger.LogError(ex, "Failed to connect to Redis server. Using default cache service.");
-
-        //    // Provide a default cache service or return null
-        //    services.AddScoped<ICacheService>((svcProvider) =>
-        //    {
-        //        // Provide a default cache service implementation
-        //        return new DefaultCacheService();
-        //    });
-        //}
-        //catch (Exception ex)
-        //{
-        //    OnaxTools.Logger.LogException(ex, "[RedisConnection]");
-        //}
         #endregion
 
 
 
-        services.AddDistributedMemoryCache();
-        services.AddSession();// (sessionOptions) =>
-                              //{
-                              //    sessionOptions.Cookie.Name = "onasc.cookie";
-                              //    sessionOptions.IdleTimeout = TimeSpan.FromMinutes(60);
-                              //    //sessionOptions.Cookie.IsEssential = true;
-                              //});
-                              //services.AddStackExchangeRedisCache((options) =>
-                              //{
-                              //    options.Configuration = RedisConfig;
-                              //    options.InstanceName = string.Concat(builder.Configuration.GetValue<string>($"{nameof(AppSettings)}:{nameof(AppSettings.AppKey)}"), "Session:");
-                              //    //options.Configuration = 
-                              //});
+        //services.AddDistributedMemoryCache();
+        //services.AddSession((sessionOptions) =>
+        //{
+        //    sessionOptions.Cookie.Name = "onasc.cookie";
+        //    sessionOptions.IdleTimeout = TimeSpan.FromMinutes(60);
+        //    //sessionOptions.Cookie.IsEssential = true;
+        //});
+        //services.AddStackExchangeRedisCache((options) =>
+        //{
+        //    options.Configuration = RedisConfig;
+        //    options.InstanceName = string.Concat(builder.Configuration.GetValue<string>($"{nameof(AppSettings)}:{nameof(AppSettings.AppKey)}"), "Session:");
+        //    //options.Configuration = 
+        //});
 
 
         services.AddHttpContextAccessor();

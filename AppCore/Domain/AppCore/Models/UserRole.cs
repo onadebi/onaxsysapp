@@ -6,7 +6,7 @@ using AppCore.Domain.AppCore.Models.Extensions;
 
 namespace AppCore.Domain.AppCore.Models
 {
-    [Table(nameof(UserRole),Schema ="profile")]
+    [Table(nameof(UserRole),Schema ="auth")]
     [BsonIgnoreExtraElements]
     public class UserRole: CommonProperties
     {
