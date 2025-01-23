@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace AppCore.Domain.Blog.Entities
 {
-    [Table(nameof(PostCategory), Schema = "Blog")]
+    [Table(nameof(PostCategory), Schema = "blog")]
     public class PostCategory : CommonProperties
     {
         [Key]

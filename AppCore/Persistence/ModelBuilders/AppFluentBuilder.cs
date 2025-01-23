@@ -34,7 +34,11 @@ public static class AppFluentBuilder
 
         model.Entity<UserProfile>(prop =>
         {
-            prop.HasMany<UserApp>(u => u.UserProfileUserApps).WithOne(p => p.UserProfile).HasForeignKey(f => f.UserId).OnDelete(DeleteBehavior.Cascade);
+            prop.HasMany<UserApp>(u => u.UserProfileUserApps)
+                .WithOne((UserApp p) => p.UserProfile)
+                .HasForeignKey(f => f.UserId)
+                .HasPrincipalKey(p => p.Guid)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
 
@@ -56,10 +60,10 @@ public static class AppFluentBuilder
 
         #region Populate database tables
 
-        model.Entity<UserRole>().HasData(
-          new UserRole { Id = (int)UserRolesEnum.Member, RoleName = UserRolesEnum.Member.ToString(), RoleDescription = "This is the default role for all users" },
-            new UserRole { Id = (int)UserRolesEnum.Admin, RoleName = UserRolesEnum.Admin.ToString(), RoleDescription = "This is the Adminstrative role." }
-            );
+        //model.Entity<UserRole>().HasData(
+        //  new UserRole { Id = (int)UserRolesEnum.Member, RoleName = UserRolesEnum.Member.ToString(), RoleDescription = "This is the default role for all users" },
+        //    new UserRole { Id = (int)UserRolesEnum.Admin, RoleName = UserRolesEnum.Admin.ToString(), RoleDescription = "This is the Adminstrative role." }
+        //    );
 
         #endregion
 
