@@ -12,7 +12,6 @@ public class CacheService : ICacheService
     private readonly IDatabase _db;
     private readonly string _appKey;
     private readonly AppSettings _appSettings;
-    //private readonly string _redisConfig;
     public CacheService(IOptions<AppSettings> appsettings, IConnectionMultiplexer cxnMultiplexer)
     {
         _appSettings = appsettings.Value; ;

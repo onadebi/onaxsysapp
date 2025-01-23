@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppCore.Domain.AppCore.Models
 {
-    [Table(nameof(UserProfile), Schema = "profile")]
+    [Table(nameof(UserProfile), Schema = "auth")]
     public class UserProfile: AppUserIdentity
     {
         [Key]

@@ -4,7 +4,9 @@
       "commandName": "Project",
       "launchBrowser": true,
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DBConString": "Server=aws-0-ca-central-1.pooler.supabase.com;Port=5432;Database=onaxsysdb;Timeout=30;User Id=postgres.uiebbzudupicqznronck;Password=SHiD9v$pc!5GUtu;Include Error Detail=true",
+        "RedisConstring": "redis-19396.c44.us-east-1-2.ec2.cloud.redislabs.com:19396,password=diQecJwBtobW1vP8tLG9hrKY5wa7SHR0"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5050"
