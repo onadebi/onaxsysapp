@@ -30,10 +30,10 @@ namespace AppCore.Domain.AppCore.Models
         public string? Password { get; set; }
 
         [Required]
-        public DateTime DateCreated { get; set; } = DateTime.UtcNow;
+        public override DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         [Required]
-        public DateTime DateLastUpdated { get; set; } = DateTime.UtcNow;
+        public DateTime UpdatedAt { get; set; } = DateTime.UtcNow;
         [Required]
         public bool IsEmailConfirmed { get; set; } = false;
         public bool IsDeactivated { get; set; } = false;

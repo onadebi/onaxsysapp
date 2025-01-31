@@ -190,12 +190,6 @@ namespace AppCore.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DateLastUpdated")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("DisplayName")
                         .HasColumnType("text");
 
@@ -254,6 +248,9 @@ namespace AppCore.Migrations
 
                     b.Property<string>("SocialLoginPlatform")
                         .HasColumnType("varchar(250)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserProfileImage")
                         .HasColumnType("text");

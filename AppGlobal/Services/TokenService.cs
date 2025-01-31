@@ -21,7 +21,7 @@ public class TokenService
     }
 
 
-    public string? CreateAppToken(AppUserIdentity user, int expireInMins = 15)
+    public string? CreateAppToken(AppUserIdentity user, out List<Claim> userClaims, int expireInMins = 15)
     {
         string? objResp = null;
         var claims = new List<Claim>
@@ -57,6 +57,7 @@ public class TokenService
         {
             OnaxTools.Logger.LogException(ex, $"[TokenService][{nameof(CreateAppToken)}]");
         }
+        userClaims = claims;
         return objResp;
     }
 
@@ -130,7 +131,7 @@ public class TokenService
                             //if more than half of the timeout interval has elapsed.
                             if (timeRemaining < timeElapsed)
                             {
-                                var prolongedToken = this.CreateAppToken(objResp.Result);
+                                var prolongedToken = this.CreateAppToken(objResp.Result, out var _);
                                 context.Response.Headers.Remove("Set-Authorization");
                                 _ = context.Response.Headers.TryAdd("Set-Authorization", prolongedToken);
 

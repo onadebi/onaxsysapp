@@ -6,6 +6,8 @@ using Microsoft.Extensions.Primitives;
 using OnaxTools.Dto.Identity;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using OnaxTools.Dto.Http;
+using AppGlobal.Helpers;
 
 namespace AppGlobal.Services;
 public class AppSessionContextRepository : IAppSessionContextRepository
@@ -52,6 +54,12 @@ public class AppSessionContextRepository : IAppSessionContextRepository
         return objResp;
     }
 
+    public async Task<GenResponse<AppUserIdentity>> GetUserDetails()
+    {
+        var tokenUser = CommonHelpers.ValidateJwt(_contextAccessor.HttpContext);
+        GenResponse<AppUserIdentity> objResp = tokenUser;
+        return await Task.Run(() => objResp);
+    }
     public void ClearCurrentUserDataFromSession()
     {
         try

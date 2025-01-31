@@ -8,6 +8,7 @@ public class AppSettings
     public string AppKey { get; set; } = string.Empty;
     public bool LogToAppInsights { get; set; }
     public Encryption? Encryption { get; set; }
+    public MessageBroker? MessageBroker { get; set; }
     public AzureBlobConfig AzureBlobConfig { get; set; } = default!;
     public required ExternalAPIs ExternalAPIs { get; set; }
     public required SessionConfig SessionConfig { get; set; }
@@ -44,6 +45,15 @@ public class AzureBlobConfig
     public string BlobReadAccessYear2099 { get; set; } = string.Empty;
     public string BlobStoragePath { get; set; } = string.Empty;
     public string DefaultContainerName { get; set; } = string.Empty;
+}
+
+public class MessageBroker
+{
+    public required RabbitMq RabbitMq { get; set; }
+}
+public class RabbitMq
+{
+    public required string ConString { get; set; }
 }
 public class Encryption
 {

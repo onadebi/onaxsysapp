@@ -12,6 +12,11 @@ using System.Text;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using AppCore.Services.Blog;
+using Microsoft.Extensions.DependencyInjection;
+using AppGlobal.Services.PubSub;
+using AppGlobal.Config.Communication;
+using System.Text.Json;
 
 namespace WebApp.Extensions;
 
@@ -19,10 +24,10 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddCustomServiceCollections(this IServiceCollection services, WebApplicationBuilder builder)
     {
-        string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKey", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
+        string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKeyEnvVar", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
         string RedisConfig = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("RedisConstring") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("RedisConstring")!;
         string MongoDbCon = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("MongoDbConnect") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("MongoDbConnect")!;
-        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=aws-0-ca-central-1.pooler.supabase.com;Port=5432;Database=onaxsys;Timeout=30;User Id=postgres.uiebbzudupicqznronck;Password=SHiD9v$pc!5GUtu;Include Error Detail=true";
+        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=localhost;Port=5432;Database=onaxsys;Timeout=120;User Id=postgres;Password=onadebi;";
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
         services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(AppSettings)));
@@ -32,13 +37,11 @@ public static class ServiceExtensions
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
         services.AddSingleton<ISqlDataAccess>((svcProvider) => Factories<SqlDataAccess>.SqlDataAccessService(serviceProvider: svcProvider, conString: dbConstring));
-        //services.AddScoped<TokenService>((svcProvider) => {
-
-        //    var sessionConfig = svcProvider.GetRequiredService<IOptions<SessionConfig>>();
-        //    var UserGroupRepo = svcProvider.GetRequiredService<IUserGroupRepository>();
-        //    var MenuRepo = svcProvider.GetRequiredService<IMenuRepository>();
-        //    return new TokenService(encryptionKey, sessionConfig, UserGroupRepo, MenuRepo);
-        //});
+        services.AddScoped<TokenService>((svcProvider) =>
+        {
+            var _appsettingsConfig = svcProvider.GetRequiredService<IOptions<AppSettings>>();
+            return new TokenService(encryptionKey, _appsettingsConfig);
+        });
         services.AddSingleton<IMongoDataAccess>((svcProvider) => new MongoDataAccess(MongoDbCon, "onasonic"));
 
         services.AddDbContext<AppDbContext>(options =>
@@ -91,23 +94,25 @@ public static class ServiceExtensions
         services.AddAuthentication(opt =>
         {
             #region for Cookie based MVC controller routes authentication
-            //opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             opt.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             //opt.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             #endregion
 
 
             #region FOR jwt
-            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             #endregion
-        }).AddCookie(x =>
+        })
+        .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, x =>
         {
-            x.Cookie.Name = "jwt";
+            x.SlidingExpiration = true;
+            // x.Cookie.Name = "token";
             x.LoginPath = "/home/Login";
             x.AccessDeniedPath = "/home/Login";
         })
-        .AddJwtBearer(options =>
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,options =>
         {
             byte[] key = Array.Empty<byte>();
             if (builder.Environment.IsDevelopment())
@@ -147,6 +152,14 @@ public static class ServiceExtensions
                     }
                     #endregion
                     return Task.CompletedTask;
+                },
+                OnChallenge = context =>
+                {
+                    context.HandleResponse();
+                    context.Response.StatusCode = 401;
+                    context.Response.ContentType = "application/json";
+                    var result = JsonSerializer.Serialize(new { message = "Unauthorized" });
+                    return context.Response.WriteAsync(result);
                 }
             };
             #endregion
@@ -171,6 +184,16 @@ public static class ServiceExtensions
             });
         });
 
+        services.AddScoped<IPostCategoryService, PostCategoryService>();
+        services.AddScoped<IUserProfileService, UserProfileService>();
+        services.AddScoped<ISocialAuthService, SocialAuthService>();
+
+        services.AddScoped<IMessageService, MessageService>();
+
+        services.AddSingleton<IMessageBrokerService>((svcP) =>
+            new MessageBrokerService(new RabbitMQ.Client.ConnectionFactory { Uri = new Uri(rabbitMqConstring) }, svcP.GetRequiredService<IOptions<AppSettings>>()
+            , Factories<MessageBrokerService>.AppLoggerFactory(svcP.GetRequiredService<IConfiguration>()))
+        );
         //services.AddScoped<IUserServiceRepository, UserServiceRepository>();
         //services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         //services.AddScoped<IUserGroupRepository, UserGroupRepository>();

@@ -13,8 +13,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace AppCore.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20250123072407_initialMigration")]
-    partial class initialMigration
+    [Migration("20250125202738_initmigrate")]
+    partial class initmigrate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -193,12 +193,6 @@ namespace AppCore.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTime>("DateLastUpdated")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("DisplayName")
                         .HasColumnType("text");
 
@@ -257,6 +251,9 @@ namespace AppCore.Migrations
 
                     b.Property<string>("SocialLoginPlatform")
                         .HasColumnType("varchar(250)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<string>("UserProfileImage")
                         .HasColumnType("text");
