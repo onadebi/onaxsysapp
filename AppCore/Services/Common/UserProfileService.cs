@@ -1,24 +1,28 @@
-﻿using AppCore.Domain.AppCore.Models;
+﻿using AppCore.Domain.AppCore.Dto;
+using AppCore.Domain.AppCore.Models;
 using AppCore.Persistence;
 using AppGlobal.Config;
 using AppGlobal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using OnaxTools.Dto.Http;
 using OnaxTools.Enums.Http;
 using System.Runtime.CompilerServices;
 
 namespace AppGlobal.Services;
-public class AuthService : IAuthService
+public class UserProfileService : IUserProfileService
 {
-    private readonly ILogger<AuthService> _logger;
+    private readonly ILogger<UserProfileService> _logger;
     private readonly AppDbContext _context;
     private readonly ISocialAuthService _socialAuthService;
+    private readonly AppSettings _appSettings;
 
-    public AuthService(ILogger<AuthService> logger, AppDbContext context, ISocialAuthService socialAuthService)
+    public UserProfileService(ILogger<UserProfileService> logger, AppDbContext context, IOptions<AppSettings> appSettings, ISocialAuthService socialAuthService)
     {
         _logger = logger;
         _context = context;
+        _appSettings = appSettings.Value;
         _socialAuthService = socialAuthService;
     }
 
@@ -58,7 +62,7 @@ public class AuthService : IAuthService
                     GenResponse<bool> socialAuthResp = new();
                     if (user.SocialLogin.SocialLoginAppName.Equals(SocialLoginPlatform.Clerk, StringComparison.InvariantCultureIgnoreCase))
                     {
-                        socialAuthResp = await _socialAuthService.ClerkAuthIsValid(user.SocialLogin.token);
+                        socialAuthResp = await _socialAuthService.ClerkAuthIsValid(user.SocialLogin.Token);
                     }
                     if (socialAuthResp.IsSuccess)
                     {
@@ -74,7 +78,7 @@ public class AuthService : IAuthService
                             {
                                 IsSocialLogin = true,
                                 SocialLoginAppName = SocialLoginPlatform.Clerk,
-                                token = user.SocialLogin.token
+                                Token = user.SocialLogin.Token
                             }
                         };
                         #region profile updates
@@ -105,7 +109,7 @@ public class AuthService : IAuthService
                 GenResponse<bool> socialAuthResp = new();
                 if (user.SocialLogin.SocialLoginAppName == SocialLoginPlatform.Clerk)
                 {
-                    socialAuthResp = await _socialAuthService.ClerkAuthIsValid(user.SocialLogin.token);
+                    socialAuthResp = await _socialAuthService.ClerkAuthIsValid(user.SocialLogin.Token);
                 }
                 if (!socialAuthResp.IsSuccess)
                 {
@@ -128,7 +132,34 @@ public class AuthService : IAuthService
                     Guid = userProfileParams.Guid,
                     Id = userProfileParams.Id
                 };
-                //string confirmationToken = Guid.NewGuid().ToString();
+                #region EMAIL CONFIRMATION
+                string confirmationToken = Guid.NewGuid().ToString();
+                    string EmailBody = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"AppCore","Templates", "ConfirmEmail.html"))
+                            .Replace("##token##", confirmationToken)
+                            .Replace("##name##", user.FirstName)
+                            .Replace("##guid##", objResp.Guid);
+                    EmailModelDTO emailBody = new EmailModelDTO()
+                    {
+                        ReceiverEmail = user.Email,
+                        EmailSubject = MessageOperations.ConfirmEmail,
+                        EmailBody = EmailBody
+                    };
+                    MessageBox msg = new()
+                    {
+                        AppName = _appSettings.AppName,
+                        Operation = AppConstants.EmailTemplateConfirmEmail,
+                        Channel = "Email",
+                        EmailReceiver = user.Email,
+                        IsProcessed = false,
+                        IsUsed = false,
+                        MessageData = confirmationToken,
+                        UserId = objResp.Guid,
+                        ForQueue = false,
+                        ExpiredAt = DateTime.Now.AddMinutes(10)
+
+                    };
+                    //GenResponse<string> mailSendResult = await _msgRepo.InsertNewMessageAndSendMail(emailBody, msg);
+                #endregion
             }
             else
             {
@@ -152,13 +183,13 @@ public class AuthService : IAuthService
             if (userDetail != null)
             {
                 bool IsValidPwd = false;
-                if (userLogin.SocialLogin.IsSocialLogin && !string.IsNullOrWhiteSpace(userLogin.SocialLogin.token))
+                if (userLogin.SocialLogin.IsSocialLogin && !string.IsNullOrWhiteSpace(userLogin.SocialLogin.Token))
                 {
                     //TODO: Call Service to validate token
                     GenResponse<bool> socialAuthResp = new();
                     if (userLogin.SocialLogin.SocialLoginAppName == SocialLoginPlatform.Clerk)
                     {
-                        socialAuthResp = await _socialAuthService.ClerkAuthIsValid(userLogin.SocialLogin.token);
+                        socialAuthResp = await _socialAuthService.ClerkAuthIsValid(userLogin.SocialLogin.Token);
                     }
                     if (!socialAuthResp.IsSuccess)
                     {
@@ -173,7 +204,7 @@ public class AuthService : IAuthService
                         return GenResponse<UserLoginResponse>.Failed("Invalid email/password supplied.", StatusCodeEnum.NotFound);
                     }
                 }
-                if (!userDetail.IsDeactivated || userDetail.IsDeleted)
+                if (userDetail.IsDeactivated || userDetail.IsDeleted)
                 {
                     return GenResponse<UserLoginResponse>.Failed("User account is currently deactivated or deleted.", StatusCodeEnum.Forbidden);
                 }
@@ -207,7 +238,7 @@ public class AuthService : IAuthService
 }
 
 
-public interface IAuthService
+public interface IUserProfileService
 {
     Task<GenResponse<UserLoginResponse?>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<UserLoginResponse>> Login(UserLoginDto userLogin, [CallerMemberName] string? caller = null, CancellationToken ct = default);

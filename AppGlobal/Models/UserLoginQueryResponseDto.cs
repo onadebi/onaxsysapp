@@ -21,6 +21,6 @@ public class UserLoginResponse
     //[System.Text.Json.Serialization.JsonIgnore]
     public string? Guid { get; set; }
     public long Id { get; set; }
-    public string[]? Roles { get; set; } = [];
+    public string[] Roles { get; set; } = [];
 
 }

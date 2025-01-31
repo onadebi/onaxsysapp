@@ -7,7 +7,6 @@ namespace WebApp.Controllers.Api;
 
 [ApiController]
 [Route("api/[controller]")]
-[AllowAnonymous]
 public class BlogController : ControllerBase
 {
     [HttpGet("categories")]

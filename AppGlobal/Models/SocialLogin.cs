@@ -3,7 +3,7 @@ public class SocialLogin
 {
     public required bool IsSocialLogin { get; set; } = false;
     public string? SocialLoginAppName { get; set; }
-    public string? token { get; set; } = null;
+    public string? Token { get; set; } = null;
 }
 
 public static class SocialLoginPlatform

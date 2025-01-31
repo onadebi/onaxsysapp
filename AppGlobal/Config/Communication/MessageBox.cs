@@ -1,13 +1,12 @@
-﻿using MongoDB.Bson.Serialization.Attributes;
 using System.ComponentModel.DataAnnotations;
-using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations.Schema;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
 using Newtonsoft.Json;
 
+namespace AppGlobal.Config.Communication;
 
-namespace AppCore.Domain.AppCore.Dto
-{
-    [Table(nameof(MessageBox))]
+[Table(nameof(MessageBox))]
     [BsonIgnoreExtraElements]
     public class MessageBox
     {
@@ -16,7 +15,7 @@ namespace AppCore.Domain.AppCore.Dto
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         [JsonProperty(PropertyName = nameof(Id))]
-        public string Id { get; set; } = Guid.NewGuid().ToString();
+        public string? Id { get; set; }
 
         [Required]
         [BsonElement(nameof(AppName))]
@@ -81,7 +80,7 @@ namespace AppCore.Domain.AppCore.Dto
         [BsonElement(nameof(UserId))]
         [JsonProperty(PropertyName = nameof(UserId))]
         [StringLength(maximumLength: 100)]
-        public string? UserId { get; set; }
+        public string UserId { get; set; }
 
         [Required]
         [BsonElement(nameof(ForQueue))]
@@ -105,8 +104,4 @@ namespace AppCore.Domain.AppCore.Dto
         [BsonElement(nameof(CompletedStatus))]
         [JsonProperty(PropertyName = nameof(CompletedStatus))]
         public short CompletedStatus { get; set; } = 0;
-
-
-
     }
-}

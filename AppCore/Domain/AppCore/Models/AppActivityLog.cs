@@ -1,4 +1,4 @@
-using AppCore.Domain.AppCore.Config;
+using AppGlobal.Config;
 
 namespace AppCore.Domain.AppCore.Dto
 {
