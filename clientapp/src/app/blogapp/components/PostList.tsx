@@ -12,7 +12,7 @@ const PostList: React.FC = () => {
     queryKey: ['blogposts/fetchall'],
     queryFn: async () => {
       const res = await appServices.blogService.getBlogPosts();
-      return res.data as BlogPost[];
+      return res.result as BlogPost[];
     },
   });
 

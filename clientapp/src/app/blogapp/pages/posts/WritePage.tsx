@@ -31,8 +31,8 @@ const WritePage = () => {
 
   useState(async () => {
     const categories = await blogService.getBlogCategories();
-    if(categories.isSuccess && categories.data){
-      setBlogCategories(categories.data);
+    if(categories.isSuccess && categories.result){
+      setBlogCategories(categories.result);
     }
   });
 

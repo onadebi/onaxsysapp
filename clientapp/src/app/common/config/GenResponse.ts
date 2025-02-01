@@ -1,37 +1,37 @@
 class GenResponse<T>{
     isSuccess: boolean;
-    data: T | undefined | null;
+    result: T | undefined | null;
     message: string | null;
     error: string | null;
-    statusCode: StatusCode;
+    statCode: StatusCode;
 
     constructor() {
         this.isSuccess = false;
         this.message = '';
-        this.statusCode = 200;
+        this.statCode = 200;
         this.error = null;
     }
 
     static Result<T>(objVal: T, message: string | null = '',statusCode: StatusCode = StatusCode.OK): GenResponse<T> {
         const objResp = new GenResponse<T>();
 
-        objResp.data = objVal;
+        objResp.result = objVal;
         if (statusCode === StatusCode.OK || statusCode === StatusCode.Created) {
             objResp.isSuccess = true;
         }
         objResp.message = message;
-        objResp.statusCode = statusCode;
+        objResp.statCode = statusCode;
 
         return objResp;
     }
 
     static Failed<T>(objVal: T, error: string, message: string | null = null,statusCode: StatusCode = StatusCode.NotImplemented){
         const objResp = new GenResponse<T>();
-        objResp.data = objVal;
+        objResp.result = objVal;
         objResp.isSuccess = false;
         objResp.error = error;
         objResp.message = message;
-        objResp.statusCode = statusCode;
+        objResp.statCode = statusCode;
         return objResp;
     }
 }

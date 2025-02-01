@@ -37,14 +37,14 @@ export class AuthService{
             })
             .catch((err) => {
                 appServices.commonService.LogError("Error in logging in: ", err);
-                objResp.data = null;
+                objResp.result = null;
                 reject(objResp);
             });
         });
     }
 
     async SocialLoginWithRegister(userProfile: AuthRegister): Promise<GenResponse<AuthProfile>> {
-        let objResp : GenResponse<AuthProfile> = { data: {} as AuthProfile, isSuccess: false, message: "", statusCode: StatusCode.OK, error: null };
+        let objResp : GenResponse<AuthProfile> = { result: {} as AuthProfile, isSuccess: false, message: "", statCode: StatusCode.OK, error: null };
         return new Promise((resolve, reject) => {
             agent.requests.post<GenResponse<AuthProfile>>(apiRoutes.auth.socialRegisterWithLogin, userProfile)
             .then((resp)=> {

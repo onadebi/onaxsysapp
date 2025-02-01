@@ -46,8 +46,8 @@ const GeneralLayout: React.FC = () => {
            appServices.authService.login(authProfileLogin)
              .then((response: GenResponse<AuthProfile>) => {
                // appServices.commonService.setSessionCookieUserProfileToBtoa(response.result);
-               if(response.isSuccess && response.data) {
-                 dispatch(setAuthProfile(response.data));                 
+               if(response.isSuccess && response.result) {
+                 dispatch(setAuthProfile(response.result));                 
                }               
              }).catch((error) => {
                appServices.commonService.LogError('Error fetching token:', error);

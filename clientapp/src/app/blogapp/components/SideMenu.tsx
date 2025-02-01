@@ -12,8 +12,8 @@ const SideMenu: React.FC = () => {
   
   useEffect(() => {
     blogService.getBlogCategories().then((resp)=>{
-      if(resp.isSuccess && resp.data){
-        setBlogCategories(resp.data);
+      if(resp.isSuccess && resp.result){
+        setBlogCategories(resp.result);
       }
     }).catch((error)=>{
       appServices.commonService.LogError(JSON.stringify(error,null,2));

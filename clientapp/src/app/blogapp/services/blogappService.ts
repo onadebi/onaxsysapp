@@ -31,15 +31,15 @@ export default class BlogAppService implements IBlogAppService {
             appServices.commonService.LogActivity(`[${`[BlogAppService][getBlogPosts]`}] ${JSON.stringify(error, null, 2)}`);
             objResp.error = `Error: ${error}`;
             objResp.isSuccess = false;
-            objResp.data = [];
-            objResp.statusCode = StatusCode.ServerError;
+            objResp.result = [];
+            objResp.statCode = StatusCode.ServerError;
         }
         return objResp;
     }
     
     addNewPost = async (newPost : BlogpostNewmodel): Promise<GenResponse<boolean>> => {
         let objResp: GenResponse<boolean> = new GenResponse();
-        if (!newPost) {objResp.data= false; objResp.error ="Invalid post content"; return objResp;};
+        if (!newPost) {objResp.result= false; objResp.error ="Invalid post content"; return objResp;};
         const initCheck = this.InitCheckIsValidPost(newPost);
         if(initCheck.isSuccess === false){
             return initCheck;
@@ -50,8 +50,8 @@ export default class BlogAppService implements IBlogAppService {
             appServices.commonService.LogActivity(`[${`[BlogAppService][addNewPost]`}] ${JSON.stringify(error, null, 2)}`);
             objResp.error = `Error add new post: ${error}`;
             objResp.isSuccess = false;
-            objResp.data = false;
-            objResp.statusCode = StatusCode.ServerError;
+            objResp.result = false;
+            objResp.statCode = StatusCode.ServerError;
         }
         return objResp;
     }
@@ -61,8 +61,8 @@ export default class BlogAppService implements IBlogAppService {
         if(!slugUrl){
             objResp.error = 'Invalid post url.';
             objResp.isSuccess = false;
-            objResp.data = null;
-            objResp.statusCode = StatusCode.BadRequest;
+            objResp.result = null;
+            objResp.statCode = StatusCode.BadRequest;
             return objResp;
         }
         try{
@@ -71,8 +71,8 @@ export default class BlogAppService implements IBlogAppService {
             appServices.commonService.LogActivity(`[${`[BlogAppService][getSingleBlogPostBySlug]`}] ${JSON.stringify(error, null, 2)}`);
             objResp.error = `Error: ${error}`;
             objResp.isSuccess = false;
-            objResp.data = null;
-            objResp.statusCode = StatusCode.ServerError;
+            objResp.result = null;
+            objResp.statCode = StatusCode.ServerError;
         }
         return objResp;
     }
@@ -95,14 +95,14 @@ export default class BlogAppService implements IBlogAppService {
         const titleMinLength = appsettings.Blog.Posts.Validations.titleMinCharactersLength;
         const contentMinLength = appsettings.Blog.Posts.Validations.contentMinCharactersLength;
         if (!post.title || !post.content || post.title.length < titleMinLength || post.content.length < contentMinLength) {
-            objResp.statusCode = StatusCode.BadRequest;
-            objResp.data = false;
+            objResp.statCode = StatusCode.BadRequest;
+            objResp.result = false;
             objResp.isSuccess = false;
             objResp.message = objResp.error = `Invalid post data title or content. Post title must be at least ${titleMinLength} characters and content must be at least ${contentMinLength} characters`;
             return objResp;
         }
-        objResp.data = true;
-        objResp.statusCode = StatusCode.OK;
+        objResp.result = true;
+        objResp.statCode = StatusCode.OK;
         objResp.isSuccess = true;
         return objResp;
     }

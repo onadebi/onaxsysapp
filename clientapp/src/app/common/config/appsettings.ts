@@ -59,6 +59,9 @@ const appsettings = {
     externalServices: {
         YoutubeUrlByVideoId: (videoId: string) => {
             return `https://www.youtube.com/watch?v=${videoId}`;
+        },
+        GoogleAuth:{
+            clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
         }
     },
     public:{

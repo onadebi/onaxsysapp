@@ -25,8 +25,8 @@ const SinglePostPage: React.FC = () => {
 
     useEffect(()=>{
       blogService.getBlogCategories().then((resp)=>{
-        if(resp.isSuccess && resp.data){
-          setCategories(resp.data);
+        if(resp.isSuccess && resp.result){
+          setCategories(resp.result);
         }
       }).catch((error)=>{
         appServices.commonService.LogError(JSON.stringify(error,null,2));
@@ -35,8 +35,8 @@ const SinglePostPage: React.FC = () => {
 
     React.useEffect(() => {
       blogService.getSingleBlogPostBySlug(pathname).then((resp)=>{
-        if(resp.isSuccess && resp.data){
-          setPost(resp.data);
+        if(resp.isSuccess && resp.result){
+          setPost(resp.result);
         }
       }).catch((error)=>{
         appServices.commonService.LogError(JSON.stringify(error,null,2));
