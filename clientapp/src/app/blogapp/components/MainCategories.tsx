@@ -10,7 +10,7 @@ const MainCategories = () => {
   useEffect(()=>{
     appServices.blogService.getBlogCategories().then((resp)=>{
       if(resp.isSuccess){
-        setCategories(resp.data!);
+        setCategories(resp.result!);
       }
     }).catch((error)=>{
       appServices.commonService.LogError(JSON.stringify(error,null,2));

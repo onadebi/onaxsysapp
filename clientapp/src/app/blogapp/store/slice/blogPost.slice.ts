@@ -7,7 +7,7 @@ export const fetchAllBlogPosts = createAsyncThunk(
     'blog/getBlogPosts',
     async () => {
         const response = await appServices.blogService.getBlogPosts();
-        const allPosts : BlogPost[] = response.data ?? [];
+        const allPosts : BlogPost[] = response.result ?? [];
         return allPosts;
     }
 );

@@ -18,7 +18,7 @@ export default class ImagesService {
                 } catch(err) {
                     console.log(err);
                     objResp.error = 'An errorr occurred while uploading image. kindly retry.';
-                    objResp.data = false;
+                    objResp.result = false;
                 }
             } else {
                 objResp.message = 'Invalid file uploaded.';

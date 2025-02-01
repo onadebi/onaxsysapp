@@ -87,9 +87,9 @@ const DashboardLayout: React.FC = () => {
           }
           appServices.authService.login(authProfileLogin)
             .then((response: GenResponse<AuthProfile>) => {
-              if(response.isSuccess && response.data) {
-                dispatch(setAuthProfile(response.data));
-                if(!response.data.roles.some(r => permittedRoles.includes(r))){
+              if(response.isSuccess && response.result) {
+                dispatch(setAuthProfile(response.result));
+                if(!response.result.roles.some(r => permittedRoles.includes(r))){
                   alert('You do not have permission to access this page');
                   navigate(BlogAppRoutes().public.home.parentRoute);
                 }
