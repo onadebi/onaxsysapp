@@ -79,13 +79,15 @@ jobs:
     #     path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
     #endregion Publish to Azure Web App
 
-    #region Build docker image and publish to Docker Hub with docker login credentials
+    #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
+      if: github.ref == 'refs/heads/main'
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_HUB_USERNAME }}
         password: ${{ secrets.DOCKER_HUB_PASSWORD }}
     - name: Build and push Docker image
+      if: github.ref == 'refs/heads/main'
       uses: docker/build-push-action@v2
       with:
         context: .
