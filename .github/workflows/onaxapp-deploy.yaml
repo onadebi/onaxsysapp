@@ -7,8 +7,8 @@ on:
       - dev
 
 env:
-    AZURE_WEBAPP_NAME: onaxapp
-    AZURE_WEBAPP_PACKAGE_PATH: CourseGen/publish
+    APP_WEBAPP_NAME: Onaxapp
+    AZURE_WEBAPP_PACKAGE_PATH: Onaxapp/publish
     CONFIGURATION: Release
     DOTNET_CORE_VERSION: 9.0.x
     WORKING_DIRECTORY: .
@@ -57,12 +57,14 @@ jobs:
       run: |
         echo "==========Verify Frontend Build (List Dir.)============"
         ls -l ${{ env.WORKING_DIRECTORY }}/${{env.PUBLISH_PATH_UI}}
+
     - name: Build
-      run: dotnet build ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-restore
+      run: dotnet build ${{ env.WORKING_DIRECTORY_SERVER }} --configuration ${{ env.CONFIGURATION }} --no-restore
     - name: Test
+      working-directory: ${{ env.WORKING_DIRECTORY}}/AppTest
       run: |
-          echo "==========Run Tests============"
-          dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
+          echo "==========Running Tests============"
+          dotnet test --no-build
     #region Publish to Azure Web App      
     # - name: Publish
     #   run: |
@@ -89,7 +91,7 @@ jobs:
         context: .
         file: ${{ env.WORKING_DIRECTORY_SERVER }}/Dockerfile
         push: true
-        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{env.AZURE_WEBAPP_NAME}}:latest
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{env.APP_WEBAPP_NAME}}:latest
         build-args: |
           DBCONSTRING=${{ secrets.DBCONSTRING }}
         secrets: |
