@@ -1,21 +1,23 @@
-import React, { FormEvent, useRef } from "react";
+import { FormEvent, useRef } from "react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import { jwtDecode } from "jwt-decode";
 import RouteTo from "./RouteTo";
 import AuthUserLoginDto from "../common/models/AuthUserLoginDto";
 import GenResponse from "../common/config/GenResponse";
-import { UserLoginResponse } from "../common/models/UserLoginResponse";
+// import { UserLoginResponse } from "../common/models/UserLoginResponse";
 
-interface LoginWidgetProps {
-    onSuccess?: (credentialResponse: CredentialResponse) => void;
-    onError?: () => void;
+interface LoginWidgetProps<T> {
+    onSuccess?: (credentialResponse: CredentialResponse | T) => void;
+    onError?: (err: GenResponse<T>) => void;
     allowSocialLogin?: boolean;
     apiUrl: string;
+    signUpRoute?: string;
 }
 
-const LoginWidget: React.FC<LoginWidgetProps> = ({onError,onSuccess,apiUrl, allowSocialLogin=true}) => {
+const LoginWidget = <T,>({onError,onSuccess,apiUrl,signUpRoute,allowSocialLogin=true}: LoginWidgetProps<T>) => {
 
-    const btnRef = useRef<HTMLButtonElement>(null);
+//   const [respData, setRespData] = React.useState<GenResponse<T>>(new GenResponse<T>());
+  const btnRef = useRef<HTMLButtonElement>(null);
   const LoginSuccess = (credentialResponse: CredentialResponse) => {
     alert(credentialResponse.credential);
     if (credentialResponse.credential) {
@@ -26,10 +28,11 @@ const LoginWidget: React.FC<LoginWidgetProps> = ({onError,onSuccess,apiUrl, allo
 
   const LoginError = () => {
     console.log("Login Failed");
-    if(onError){onError();}
+    if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
   };
   const LoginSubmitForm =async (evt: FormEvent)=>{
     evt.preventDefault();
+    if (!btnRef.current) return;
     btnRef.current!.disabled = true;
     btnRef.current!.innerText = "Processing...";
     const allFormData = new FormData(document.getElementById("frmLogin") as HTMLFormElement);
@@ -43,21 +46,27 @@ const LoginWidget: React.FC<LoginWidgetProps> = ({onError,onSuccess,apiUrl, allo
             },
             body: JSON.stringify(jsonEntries)
         });
-        if(objResp && objResp.status){
-            const objRespData = (await objResp.json()) as GenResponse<UserLoginResponse>;
-            if(objRespData.isSuccess){
+        if(objResp?.status){
+            const objRespData = (await objResp.json()) as GenResponse<T>;
+            if(objRespData.isSuccess && objRespData.result){
                 alert(JSON.stringify(objRespData));
+                if(onSuccess){onSuccess(objRespData.result);}
             }else{
                 alert(objRespData.error ?? objRespData.message);
+                if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
             }
         }else{
             alert("Login failed");
+            if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
         }
     }catch{
         alert('An error occured. Kindly retry again.');
+        if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
     }finally{
-        btnRef.current!.disabled = false;
-        btnRef.current!.innerText = "Sign in";
+        if (btnRef.current) {
+            btnRef.current.disabled = false;
+            btnRef.current.innerText = "Sign in";
+        }
     }
   }
   return (
@@ -88,12 +97,17 @@ const LoginWidget: React.FC<LoginWidgetProps> = ({onError,onSuccess,apiUrl, allo
             </div>
         </div>
       </form>
-      <section id="dvSignup">
-        <div className="text-center mt-4">
-            <span className="text-xs font-semibold text-gray-500">Don't have an account?</span>
-            <RouteTo to="/register" className="text-blue-600 text-xs">&nbsp;Sign up</RouteTo>
-        </div>
-      </section>
+      {
+        signUpRoute && (
+            <section id="dvSignup">
+                <div className="text-center mt-4">
+                    <span className="text-xs font-semibold text-gray-500">Don't have an account?</span>
+                    <RouteTo to={signUpRoute} className="text-blue-600 text-xs">&nbsp;Sign up</RouteTo>
+                </div>
+            </section>
+        )
+      }
+      
     </div>
   );
 };

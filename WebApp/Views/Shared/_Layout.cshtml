@@ -31,9 +31,7 @@
                         <li class="nav-item">
                             @if (User.Identity != null && User.Identity.IsAuthenticated)
                             {
-                                <span id="spnLogout" class="nav-link text-dark" style="cursor:pointer;">Logout</span>
-
-                                @User.Identity.Name
+                                <span id="spnLogout" class="nav-link text-dark" style="cursor:pointer;">Logout  @User.Claims.FirstOrDefault(c => c.Type == "display_name")?.Value.Split(' ')[0]</span>
                             }
                             else
                             {
@@ -45,13 +43,6 @@
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home"
-                                asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href='@Url.Action("index","contact")'>Contact here</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link text-dark" href='@Url.Action("portal","zone")'>Portal</a>
