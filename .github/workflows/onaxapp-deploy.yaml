@@ -4,7 +4,7 @@ on:
     push:
       branches:
       - main
-      - auth-test
+      - dev
 
 env:
     AZURE_WEBAPP_NAME: onaxapp
@@ -41,9 +41,9 @@ jobs:
         dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Restore Dependencies
       run: |
-          echo "===Working Dir:::=> ${{ env.WORKING_DIRECTORY }}==="
+          echo "===Working Dir:::=> ${{ env.WORKING_DIRECTORY_SERVER }}==="
           pwd
-          dotnet restore ${{ env.WORKING_DIRECTORY }}
+          dotnet restore
     - name: Install NPM packages
       working-directory: ${{ env.WORKING_DIRECTORY }}/clientapp
       run: |
