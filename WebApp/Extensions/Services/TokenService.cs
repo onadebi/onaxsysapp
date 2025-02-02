@@ -83,7 +83,7 @@ public class TokenService
 
                 if (jwtoken != null)
                 {
-                    Dictionary<string, string> tokenValues = new Dictionary<string, string>();
+                    Dictionary<string, string> tokenValues = [];
                     foreach (var claim in jwtoken.Claims)
                     {
                         if (tokenValues.ContainsKey(claim.Type))
@@ -142,7 +142,7 @@ public class TokenService
         }
         catch (SecurityTokenExpiredException err)
         {
-            OnaxTools.Logger.LogException(err, "[CommonHelpers][ValidateJwt]");
+            await Task.Run(()=>OnaxTools.Logger.LogException(err, "[CommonHelpers][ValidateJwt]"));
             objResp = GenResponse<AppUserIdentity>.Failed("Expired token credentials");
         }
         catch (Exception ex)
