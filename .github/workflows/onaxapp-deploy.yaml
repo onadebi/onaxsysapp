@@ -15,7 +15,7 @@ env:
     WORKING_DIRECTORY_UI: clientapp
     PUBLISH_PATH_UI: WebApp/wwwroot/portal
     PUBLISHED_APP_PATH: WebApp/dist
-    WORKING_DIRECTORY_SERVER: WebApp
+    WORKING_DIRECTORY_SERVER: ./WebApp
 
 jobs:
   frontend_env_dependencies:
@@ -43,6 +43,7 @@ jobs:
       run: |
           echo "===Working Dir:::=> ${{ env.WORKING_DIRECTORY_SERVER }}==="
           pwd
+          ls -l
           dotnet restore
     - name: Install NPM packages
       working-directory: ${{ env.WORKING_DIRECTORY }}/clientapp
