@@ -1,0 +1,97 @@
+name: Build and deploy .NET core to Web App
+
+on:
+    push:
+      branches:
+      - main
+      - auth-test
+
+env:
+    AZURE_WEBAPP_NAME: onaxapp
+    AZURE_WEBAPP_PACKAGE_PATH: CourseGen/publish
+    CONFIGURATION: Release
+    DOTNET_CORE_VERSION: 9.0.x
+    WORKING_DIRECTORY: .
+    WORKING_DIRECTORY_UI: clientapp
+    PUBLISH_PATH_UI: WebApp/wwwroot/portal
+    PUBLISHED_APP_PATH: WebApp/dist
+    WORKING_DIRECTORY_SERVER: WebApp
+
+jobs:
+  frontend_env_dependencies:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '20.16.0'
+    - name: Install TypeScript and Yarn
+      run: |
+        npm install -g typescript
+
+  build_app:
+    runs-on: ubuntu-latest
+    needs: frontend_env_dependencies
+    steps:
+    - uses: actions/checkout@v4
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v3
+      with:
+        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
+    - name: Restore Dependencies
+      run: |
+          echo "===Working Dir:::=> ${{ env.WORKING_DIRECTORY }}==="
+          pwd
+          dotnet restore ${{ env.WORKING_DIRECTORY }}
+    - name: Install NPM packages
+      working-directory: ${{ env.WORKING_DIRECTORY }}/clientapp
+      run: |
+          echo "======Install and build Client UI packages======="
+          npm install -f
+          mkdir -p ${{env.WORKING_DIRECTORY}}/${{env.PUBLISH_PATH_UI}}
+          npm run build
+    - name: Verify Frontend Build
+      run: |
+        echo "==========Verify Frontend Build (List Dir.)============"
+        ls -l ${{ env.WORKING_DIRECTORY }}/${{env.PUBLISH_PATH_UI}}
+    - name: Build
+      run: dotnet build ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-restore
+    - name: Test
+      run: |
+          echo "==========Run Tests============"
+          dotnet test "${{ env.WORKING_DIRECTORY }}" --no-build
+    #region Publish to Azure Web App      
+    # - name: Publish
+    #   run: |
+    #       set -e
+    #       dotnet publish ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-build --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    #       echo "==========Verify Frontend Migration to build output============"
+    #       ls -l ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/wwwroot
+    # - name: Publish Artifacts
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: webapp
+    #     path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    #endregion Publish to Azure Web App
+
+    #region Build docker image and publish to Docker Hub with docker login credentials
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_HUB_USERNAME }}
+        password: ${{ secrets.DOCKER_HUB_PASSWORD }}
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        file: ${{ env.WORKING_DIRECTORY_SERVER }}/Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_HUB_USERNAME }}/${{env.AZURE_WEBAPP_NAME}}:latest
+        build-args: |
+          DBCONSTRING=${{ secrets.DBCONSTRING }}
+        secrets: |
+          DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
+          DOCKER_HUB_PASSWORD=${{ secrets.DOCKER_HUB_PASSWORD }}
+    #endregion Build docker image and publish to Docker Hub with docker login credentials
+    

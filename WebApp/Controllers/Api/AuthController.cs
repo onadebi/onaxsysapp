@@ -1,9 +1,9 @@
 ﻿using AppGlobal.Config;
 using AppGlobal.Models;
 using AppGlobal.Services;
-using Microsoft.AspNet.Identity;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OnaxTools.Dto.Http;
@@ -53,7 +53,7 @@ namespace WebApp.Controllers.Api
             var objResp = await this._userProfileSvc.RegisterUser(user);
             if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result?.Email))
             {
-                objResp.Result.token = _tokenService.CreateAppToken(new AppUserIdentity() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles] }, out List<Claim> userClaims);
+                objResp.Result.token = _tokenService.CreateAppToken(new AppUserIdentity() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles] }, out List<Claim> _);
                 return Ok(objResp);
             }
             return Ok(objResp); ;
@@ -67,7 +67,7 @@ namespace WebApp.Controllers.Api
             var objResp = await _userProfileSvc.Login(user);
             if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result.Email))
             {
-                AppUserIdentity userInfo = new AppUserIdentity() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles], Id = objResp.Result.Id };
+                AppUserIdentity userInfo = new() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles], Id = objResp.Result.Id };
                 objResp.Result.token = _tokenService.CreateAppToken(userInfo, out List<Claim> userClaims, 15 * 4 * 24);
                 if (objResp.Result.token == null)
                 {
@@ -75,7 +75,8 @@ namespace WebApp.Controllers.Api
                 }
                 if (userClaims != null && userClaims.Count > 0)
                 {
-                    ClaimsIdentity userIdentity = new ClaimsIdentity(userClaims, DefaultAuthenticationTypes.ApplicationCookie);
+                    //ClaimsIdentity userIdentity = new ClaimsIdentity(userClaims, DefaultAuthenticationTypes.ApplicationCookie);
+                    ClaimsIdentity userIdentity = new (userClaims, IdentityConstants.ApplicationScheme);
                     if (_contextAccessor.HttpContext != null)
                     {
                         await _contextAccessor.HttpContext.SignInAsync(new ClaimsPrincipal(userIdentity));

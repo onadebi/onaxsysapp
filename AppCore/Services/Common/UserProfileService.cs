@@ -2,6 +2,7 @@
 using AppCore.Domain.AppCore.Models;
 using AppCore.Persistence;
 using AppGlobal.Config;
+using AppGlobal.Config.Communication;
 using AppGlobal.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
