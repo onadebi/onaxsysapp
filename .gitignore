@@ -14,6 +14,8 @@
 *.sln.docstates
 .vscode
 OnaxApp
+AppCore/Migrations
+AppCore/Migrations/AppDbContextModelSnapshot.cs
 WebApp/wwwroot/portal
 docker-compose.override.yml
 
@@ -486,3 +488,4 @@ $RECYCLE.BIN/
 
 # Vim temporary swap files
 *.swp
+/AppCore/Migrations/AppDbContextModelSnapshot.cs
