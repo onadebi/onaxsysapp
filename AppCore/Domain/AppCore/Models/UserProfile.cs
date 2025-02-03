@@ -25,8 +25,8 @@ namespace AppCore.Domain.AppCore.Models
         [EmailAddress]
         [StringLength(maximumLength: 100)]
         public override required string Email { get; set; }
-        [Required]
-        [StringLength(maximumLength: 100)]
+
+        [StringLength(maximumLength: 150)]
         public string? Password { get; set; }
 
         [Required]

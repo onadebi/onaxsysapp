@@ -2,6 +2,6 @@
 public class UserLoginDto
 {
     public required string Email { get; set; }
-    public string? Password { get; set; }
-    public required SocialLogin SocialLogin { get; set; }
+    public required string Password { get; set; }
+    public SocialLogin? SocialLogin { get; set; }
 }

@@ -35,9 +35,11 @@
         let data = ''
         if(response.status === 200){
            data = await response.json();
+           window.location.href ='/';
            console.log(data);
         }else{
            data = await response.json();
+           alert(JSON.stringify(data));
         }
         console.log(data);
     });
