@@ -8,7 +8,7 @@ public class SocialLogin
 
 public static class SocialLoginPlatform
 {
-    public const string Google = "Google";
+    public const string Google = "GoogleOAuth";
     public const string Clerk = "Clerk";
     public const string Twitter = "Twitter";
     public const string LinkedIn = "LinkedIn";

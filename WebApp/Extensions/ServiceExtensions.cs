@@ -1,5 +1,4 @@
-﻿using AppCore.Domain.AppCore.Dto;
-using AppCore.Persistence;
+﻿using AppCore.Persistence;
 using AppGlobal.Config;
 using AppGlobal.Services.Common.DbAccess;
 using AppGlobal.Services.DbAccess;
@@ -13,10 +12,10 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using AppCore.Services.Blog;
-using Microsoft.Extensions.DependencyInjection;
 using AppGlobal.Services.PubSub;
 using AppGlobal.Config.Communication;
 using System.Text.Json;
+using AppCore.Config;
 
 namespace WebApp.Extensions;
 

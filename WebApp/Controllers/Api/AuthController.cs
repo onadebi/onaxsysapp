@@ -60,23 +60,76 @@ namespace WebApp.Controllers.Api
         }
 
         [AllowAnonymous]
+        [HttpPost("GoogleLogin")]
+        [ProducesResponseType(typeof(GenResponse<UserLoginResponse>), (int)HttpStatusCode.OK)]
+        public async Task<IActionResult> GoogleLogin(string token)
+        {
+            var objResp = await _userProfileSvc.GoogleLogin(token);
+            objResp = await LoginContextTokenHelper(objResp);
+            return StatusCode(objResp.StatCode, objResp);
+        }
+
+
+
+        [AllowAnonymous]
         [HttpPost("Login")]
         [ProducesResponseType(typeof(GenResponse<UserLoginResponse>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Login(UserLoginDto user)
         {
             var objResp = await _userProfileSvc.Login(user);
+            #region OBSOLETE CODE due to refactoring
+            //if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result.Email))
+            //{
+            //    AppUserIdentity userInfo = new() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles], Id = objResp.Result.Id };
+            //    objResp.Result.token = _tokenService.CreateAppToken(userInfo, out List<Claim> userClaims, 15 * 4 * 24);
+            //    if (objResp.Result.token == null)
+            //    {
+            //        return StatusCode(objResp.StatCode, GenResponse<UserLoginResponse>.Failed("Unable to generate token. Kindly retry"));
+            //    }
+            //    if (userClaims != null && userClaims.Count > 0)
+            //    {
+            //        //ClaimsIdentity userIdentity = new ClaimsIdentity(userClaims, DefaultAuthenticationTypes.ApplicationCookie);
+            //        ClaimsIdentity userIdentity = new (userClaims, IdentityConstants.ApplicationScheme);
+            //        if (_contextAccessor.HttpContext != null)
+            //        {
+            //            await _contextAccessor.HttpContext.SignInAsync(new ClaimsPrincipal(userIdentity));
+            //        }
+            //    }
+
+            //    _contextAccessor.HttpContext?.Response.Cookies.Append(_appSettings.SessionConfig.Auth.token, objResp.Result.token, new CookieOptions()
+            //    {
+            //        Expires = DateTime.Now.AddMinutes(_appSettings.SessionConfig.Auth.ExpireMinutes),
+            //        HttpOnly = _appSettings.SessionConfig.Auth.HttpOnly,
+            //        Secure = _appSettings.SessionConfig.Auth.Secure,
+            //        IsEssential = _appSettings.SessionConfig.Auth.IsEssential,
+            //        SameSite = SameSiteMode.None
+            //    });
+            //    // _contextAccessor.HttpContext.Request.Cookies.TryGetValue(AppConstants.CookieUserId, out string cookieValue);
+            //    // AppSessionManager.UpdateUserSessionData(_contextAccessor.HttpContext, GenResponse<AppUserIdentity>.Success(userInfo),cookieValue);
+            //}
+            #endregion
+            objResp = await LoginContextTokenHelper(objResp);
+            return StatusCode(objResp.StatCode, objResp);
+        }
+
+
+        #region Google Social Authentication
+        private async Task<GenResponse<UserLoginResponse>> LoginContextTokenHelper(GenResponse<UserLoginResponse> objResp)
+        {
             if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result.Email))
             {
                 AppUserIdentity userInfo = new() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles], Id = objResp.Result.Id };
                 objResp.Result.token = _tokenService.CreateAppToken(userInfo, out List<Claim> userClaims, 15 * 4 * 24);
                 if (objResp.Result.token == null)
                 {
-                    return StatusCode(objResp.StatCode, GenResponse<UserLoginResponse>.Failed("Unable to generate token. Kindly retry"));
+                    objResp.Error = objResp.Message = "Unable to generate token. Kindly retry";
+                    objResp.IsSuccess = false;
+                    return objResp;
                 }
                 if (userClaims != null && userClaims.Count > 0)
                 {
                     //ClaimsIdentity userIdentity = new ClaimsIdentity(userClaims, DefaultAuthenticationTypes.ApplicationCookie);
-                    ClaimsIdentity userIdentity = new (userClaims, IdentityConstants.ApplicationScheme);
+                    ClaimsIdentity userIdentity = new(userClaims, IdentityConstants.ApplicationScheme);
                     if (_contextAccessor.HttpContext != null)
                     {
                         await _contextAccessor.HttpContext.SignInAsync(new ClaimsPrincipal(userIdentity));
@@ -94,9 +147,9 @@ namespace WebApp.Controllers.Api
                 // _contextAccessor.HttpContext.Request.Cookies.TryGetValue(AppConstants.CookieUserId, out string cookieValue);
                 // AppSessionManager.UpdateUserSessionData(_contextAccessor.HttpContext, GenResponse<AppUserIdentity>.Success(userInfo),cookieValue);
             }
-            return StatusCode(objResp.StatCode, objResp);
+            return objResp;
         }
-
+        #endregion
 
     }
 }

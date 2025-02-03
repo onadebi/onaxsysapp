@@ -21,6 +21,7 @@ services:
       - BlobStorageConstring=${BlobStorageConstring}
       - BlobReadAccessYear2099=${BlobReadAccessYear2099}
       - BlobStoragePath=${BlobStoragePath}
+      - GoogleOAuthClientId=${GoogleOAuthClientId}
     ports:
         - "5000:80"
         - "5001:443" 

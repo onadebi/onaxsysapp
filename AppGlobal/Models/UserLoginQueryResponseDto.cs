@@ -20,6 +20,7 @@ public class UserLoginResponse
     public string? Email { get; set; }
     //[System.Text.Json.Serialization.JsonIgnore]
     public string? Guid { get; set; }
+    public string? Picture { get; set; }
     public long Id { get; set; }
     public string[] Roles { get; set; } = [];
 

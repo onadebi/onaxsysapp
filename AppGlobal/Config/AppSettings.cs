@@ -20,6 +20,7 @@ public class ExternalAPIs
     public OpenAI? OpenAI { get; set; }
     public required GeminiApi GeminiApi { get; set; }
     public required YoutubeApi YoutubeApi { get; set; }
+    public required GoogleOAuth GoogleOAuth { get; set; }
 }
 public class Prompts
 {
@@ -29,6 +30,11 @@ public class Prompts
 public class OpenAI : UrlGeneric
 {
     public string OpenAIKey { get; set; } = string.Empty;
+}
+
+public class GoogleOAuth : UrlGeneric
+{
+    public string ClientId { get; set; } = string.Empty;
 }
 
 public class GeminiApi : UrlGeneric

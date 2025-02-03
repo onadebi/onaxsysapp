@@ -11,6 +11,7 @@
         "EncryptionKeyEnvVar": "24245242rwgfbefbfbb24245242rwgfbefbfbb24245242rwgfbefbfbb24245242rwgfbefbfbb",
         "RabbitMqConString": "amqps://nmyhlrww:GbMk7xqAPKqymDVkIGIJXJRpVdun4VRj@rattlesnake.rmq.cloudamqp.com/nmyhlrww",
         "MongoDbConnect": "mongodb+srv://onadebi:onadebi1@onaxcore.c4e29.mongodb.net/?retryWrites=true&w=majority",
+        "GoogleOAuthClientId":"876938636452-ck8pmi1niv5vsmtj7842ajaiu01nk04g.apps.googleusercontent.com"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:5050"

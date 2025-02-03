@@ -56,7 +56,11 @@ public class AppSessionContextRepository : IAppSessionContextRepository
 
     public async Task<GenResponse<AppUserIdentity>> GetUserDetails()
     {
-        var tokenUser = CommonHelpers.ValidateJwt(_contextAccessor.HttpContext);
+        if(_contextAccessor.HttpContext == null)
+        {
+            return GenResponse<AppUserIdentity>.Failed("Invalid token credentials");
+        }
+        GenResponse<AppUserIdentity>? tokenUser = CommonHelpers.ValidateJwt(_contextAccessor.HttpContext);
         GenResponse<AppUserIdentity> objResp = tokenUser;
         return await Task.Run(() => objResp);
     }
