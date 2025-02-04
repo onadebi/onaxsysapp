@@ -62,9 +62,13 @@ namespace WebApp.Controllers.Api
         [AllowAnonymous]
         [HttpPost("GoogleLogin")]
         [ProducesResponseType(typeof(GenResponse<UserLoginResponse>), (int)HttpStatusCode.OK)]
-        public async Task<IActionResult> GoogleLogin(string token)
+        public async Task<IActionResult> GoogleLogin([FromBody]GoogleOAuth token)
         {
-            var objResp = await _userProfileSvc.GoogleLogin(token);
+            if(token == null || String.IsNullOrWhiteSpace(token.Token))
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest, GenResponse<UserLoginResponse>.Failed("Invalid token"));
+            }
+            var objResp = await _userProfileSvc.GoogleLogin(token.Token);
             objResp = await LoginContextTokenHelper(objResp);
             return StatusCode(objResp.StatCode, objResp);
         }
@@ -149,6 +153,8 @@ namespace WebApp.Controllers.Api
             }
             return objResp;
         }
+
+        public record GoogleOAuth(string Token);
         #endregion
 
     }
