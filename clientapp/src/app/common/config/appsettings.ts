@@ -2,7 +2,7 @@
  * Application settings configuration.
  */
 const appsettings = {
-    appName: 'Onaxsys DM',
+    appName: 'OnaxApp',
     appKey: 'OnaxAppKey',
     appUrl: window.location.origin, //'http://localhost:3500',
     // appUrl: 'https://coursetakeoff.live',

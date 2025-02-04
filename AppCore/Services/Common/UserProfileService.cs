@@ -156,12 +156,13 @@ public class UserProfileService : IUserProfileService
             var userDetail = await _context.UserProfiles.Include(m => m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLoginEamil);
             if (userDetail != null)
             {
+                var userRoles = userDetail.UserProfileUserApps.Count > 0 ? userDetail.UserProfileUserApps.FirstOrDefault(m => m.AppId == _appSettings.AppName && m.OAuthIdentity == SocialLoginPlatform.Google)?.UserRole : ["user"];
                 UserLoginResponse result = new()
                 {
                     Email = userDetail.Email,
                     FirstName = userDetail.FirstName,
                     LastName = userDetail.LastName,
-                    Roles = userDetail.UserProfileUserApps.Count > 0 ? [.. userDetail.UserProfileUserApps.FirstOrDefault(m => m.AppId == _appSettings.AppName && m.SocialPlatform == googleOAuthResp.Result.Issuer)?.UserRole] : [],
+                    Roles = userRoles == null ? ["user"]: [.. userRoles],
                     Guid = userDetail.Guid,
                     Id = userDetail.Id
                 };

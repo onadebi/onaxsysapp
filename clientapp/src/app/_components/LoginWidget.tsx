@@ -1,29 +1,56 @@
 import { FormEvent, useRef } from "react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
-import { jwtDecode } from "jwt-decode";
 import RouteTo from "./RouteTo";
 import AuthUserLoginDto from "../common/models/AuthUserLoginDto";
 import GenResponse from "../common/config/GenResponse";
 // import { UserLoginResponse } from "../common/models/UserLoginResponse";
 
 interface LoginWidgetProps<T> {
-    onSuccess?: (credentialResponse: CredentialResponse | T) => void;
+    onSuccess?: (credentialResponse: GenResponse<T>) => void;
     onError?: (err: GenResponse<T>) => void;
     allowSocialLogin?: boolean;
     apiUrl: string;
+    googleApiUrl: string;
     signUpRoute?: string;
 }
 
-const LoginWidget = <T,>({onError,onSuccess,apiUrl,signUpRoute,allowSocialLogin=true}: LoginWidgetProps<T>) => {
+const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allowSocialLogin=true}: LoginWidgetProps<T>) => {
 
 //   const [respData, setRespData] = React.useState<GenResponse<T>>(new GenResponse<T>());
   const btnRef = useRef<HTMLButtonElement>(null);
-  const LoginSuccess = (credentialResponse: CredentialResponse) => {
+  const LoginSuccess = async (credentialResponse: CredentialResponse) => {
     alert(credentialResponse.credential);
     if (credentialResponse.credential) {
-      console.log(JSON.stringify(jwtDecode(credentialResponse.credential)));
+        //TODO: Call backend AP and retrieve consisite UserLoginResponse details
+        try{
+            const objResp = await fetch(googleApiUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({token: credentialResponse.credential})
+            });
+        //   if(onSuccess){onSuccess(GenResponse.Result<T>(credentialResponse);}
+          if(objResp?.status){
+            const objRespData = (await objResp.json()) as GenResponse<T>;
+            if(objRespData.isSuccess && objRespData.result){
+                alert(JSON.stringify(objRespData));
+                if(onSuccess){onSuccess(GenResponse.Result(objRespData.result));}
+            }else{
+                alert(objRespData.error ?? objRespData.message);
+                if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
+            }
+            }
+        else{
+            alert("Login failed");
+            if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
+        }
+        }
+        catch{
+            alert('An error occured. Kindly retry again.');
+            if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
+        }
     }
-    if(onSuccess){onSuccess(credentialResponse);}
   };
 
   const LoginError = () => {
@@ -50,7 +77,7 @@ const LoginWidget = <T,>({onError,onSuccess,apiUrl,signUpRoute,allowSocialLogin=
             const objRespData = (await objResp.json()) as GenResponse<T>;
             if(objRespData.isSuccess && objRespData.result){
                 alert(JSON.stringify(objRespData));
-                if(onSuccess){onSuccess(objRespData.result);}
+                if(onSuccess){onSuccess(GenResponse.Result(objRespData.result));}
             }else{
                 alert(objRespData.error ?? objRespData.message);
                 if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
