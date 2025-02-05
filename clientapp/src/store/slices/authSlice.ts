@@ -1,19 +1,22 @@
 
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { AuthProfile } from "../../app/common/models/AuthProfile";
+import { UserLoginResponse } from "../../app/common/models/UserLoginResponse";
 
-const authProfileInitState: AuthProfile =  {} as AuthProfile;
+const authProfileInitState: UserLoginResponse =  {} as UserLoginResponse;
 
 export const AuthSlice = createSlice({
     name: 'auth',
     initialState: authProfileInitState,
     reducers: {
-        setAuthProfile: (state, action: PayloadAction<AuthProfile>) => {
+        setAuthProfile: (state, action: PayloadAction<UserLoginResponse>) => {
             state = action.payload;
             return state;
         },
         clearAuthProfile: () => {
             return authProfileInitState;
+        },
+        getAuthProfile: (state) => {
+            return state;
         }
     }
 });

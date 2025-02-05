@@ -68,7 +68,7 @@ namespace WebApp.Controllers.Api
             {
                 return StatusCode((int)HttpStatusCode.BadRequest, GenResponse<UserLoginResponse>.Failed("Invalid token"));
             }
-            var objResp = await _userProfileSvc.GoogleLogin(token.Token);
+            GenResponse<UserLoginResponse> objResp = await _userProfileSvc.GoogleLogin(token.Token);
             objResp = await LoginContextTokenHelper(objResp);
             return StatusCode(objResp.StatCode, objResp);
         }
@@ -80,7 +80,7 @@ namespace WebApp.Controllers.Api
         [ProducesResponseType(typeof(GenResponse<UserLoginResponse>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Login(UserLoginDto user)
         {
-            var objResp = await _userProfileSvc.Login(user);
+            GenResponse<UserLoginResponse> objResp = await _userProfileSvc.Login(user);
             #region OBSOLETE CODE due to refactoring
             //if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result.Email))
             //{

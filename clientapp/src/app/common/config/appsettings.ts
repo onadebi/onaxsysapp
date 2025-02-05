@@ -8,7 +8,7 @@ const appsettings = {
     // appUrl: 'https://coursetakeoff.live',
     env: 'development',
     baseUrls: {
-        baseUrl: 'http://localhost:4500', 
+        baseUrl: 'http://localhost:5050', 
         // baseUrl: `${window.location.origin}/api`,
     },
     Auth:{
@@ -75,7 +75,8 @@ const appsettings = {
         }
     },
     token: {
-        authName: 'xray-token'
+        authName: 'xray-token',
+        authToken: 'onx_token'
     },
 };
 export const nameOfFactory = <T>()=> (name: keyof T)=> name;

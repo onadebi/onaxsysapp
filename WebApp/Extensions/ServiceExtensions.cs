@@ -107,7 +107,7 @@ public static class ServiceExtensions
         .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, x =>
         {
             x.SlidingExpiration = true;
-            // x.Cookie.Name = "token";
+            // x.Cookie.Name = "onx_token";
             x.LoginPath = "/home/Login";
             x.AccessDeniedPath = "/home/Login";
         })
@@ -139,7 +139,7 @@ public static class ServiceExtensions
                 OnMessageReceived = context =>
                 {
                     string tokenLocation = $"{nameof(AppSettings)}:{nameof(AppSettings.SessionConfig)}:{nameof(SessionConfig.Auth)}:{nameof(SessionConfig.Auth.token)}";
-                    string tokenName = builder.Configuration.GetValue<string>(tokenLocation) ?? "token";
+                    string tokenName = builder.Configuration.GetValue<string>(tokenLocation) ?? "onx_token";
                     context.Token = context.Request.Cookies[key: tokenName];
                     #region USe Bearer Token in the absence of Cookie auth
                     if (context.Token == null)
