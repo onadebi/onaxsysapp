@@ -12,14 +12,19 @@ interface LoginWidgetProps<T> {
     apiUrl: string;
     googleApiUrl: string;
     signUpRoute?: string;
+    loadingText?: string;
 }
 
-const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allowSocialLogin=true}: LoginWidgetProps<T>) => {
+const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allowSocialLogin=true, loadingText="Processing..."}: LoginWidgetProps<T>) => {
 
 //   const [respData, setRespData] = React.useState<GenResponse<T>>(new GenResponse<T>());
   const btnRef = useRef<HTMLButtonElement>(null);
   const LoginSuccess = async (credentialResponse: CredentialResponse) => {
-    alert(credentialResponse.credential);
+    if (btnRef.current)
+    {
+        btnRef.current!.disabled = true;
+        btnRef.current!.innerText = loadingText;
+    }
     if (credentialResponse.credential) {
         //TODO: Call backend AP and retrieve consisite UserLoginResponse details
         try{
@@ -34,10 +39,9 @@ const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allo
           if(objResp?.status){
             const objRespData = (await objResp.json()) as GenResponse<T>;
             if(objRespData.isSuccess && objRespData.result){
-                alert(JSON.stringify(objRespData));
+                // alert(JSON.stringify(objRespData));
                 if(onSuccess){onSuccess(GenResponse.Result(objRespData.result));}
             }else{
-                alert(objRespData.error ?? objRespData.message);
                 if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
             }
             }
@@ -47,24 +51,27 @@ const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allo
         }
         }
         catch{
-            alert('An error occured. Kindly retry again.');
+            // alert('An error occured. Kindly retry again.');
             if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
+        }finally{
+            if (btnRef.current) {
+                btnRef.current.disabled = false;
+                btnRef.current.innerText = "Sign in";
+            }
         }
     }
   };
 
   const LoginError = () => {
-    console.log("Login Failed");
     if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
   };
   const LoginSubmitForm =async (evt: FormEvent)=>{
     evt.preventDefault();
     if (!btnRef.current) return;
     btnRef.current!.disabled = true;
-    btnRef.current!.innerText = "Processing...";
+    btnRef.current!.innerText = loadingText;
     const allFormData = new FormData(document.getElementById("frmLogin") as HTMLFormElement);
     const jsonEntries = {...Object.fromEntries(allFormData.entries()), socialLogin :{isSocialLogin: false}} as AuthUserLoginDto;
-    alert(JSON.stringify(jsonEntries));
     try{
         const objResp = await fetch(apiUrl, {
             method: 'POST',
@@ -76,10 +83,10 @@ const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allo
         if(objResp?.status){
             const objRespData = (await objResp.json()) as GenResponse<T>;
             if(objRespData.isSuccess && objRespData.result){
-                alert(JSON.stringify(objRespData));
+                // alert(JSON.stringify(objRespData));
                 if(onSuccess){onSuccess(GenResponse.Result(objRespData.result));}
             }else{
-                alert(objRespData.error ?? objRespData.message);
+                // alert(objRespData.error ?? objRespData.message);
                 if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
             }
         }else{

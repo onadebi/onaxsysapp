@@ -87,6 +87,7 @@ public static class CommonHelpers
         }
         catch (Exception ex)
         {
+            Console.WriteLine($"[CommonHelpers][ValidateJwt]=> {ex.Message}");
             objResp = GenResponse<AppUserIdentity>.Failed("Invalid token credentials");
         }
         return objResp;

@@ -1,7 +1,7 @@
-import { SocialLogin } from "./AuthProfile";
+import { SocialLogin } from "./UserLoginResponse";
 
 export default class AuthUserLoginDto {
     email!: string;
-    password?: string;
+    password!: string;
     socialLogin!: SocialLogin;
 }

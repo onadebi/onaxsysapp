@@ -1,12 +1,18 @@
-import { SocialLogin } from "./AuthProfile";
-
-export class UserLoginResponse {
-    firstName?: string;
-    lastName?: string;
-    email?: string | null;
-    guid?: string;
-    id: string = '';
-    roles: string[] = [];
+export type UserLoginResponse = {
+    firstName: string;
+    lastName: string;
+    email: string;
+    guid: string;
+    id: string;
+    roles: string[];
     token?: string;
     socialLogin?: SocialLogin;
 }
+
+export interface SocialLogin {
+    isSocialLogin: boolean
+    socialLoginAppName: string
+    app_id: string;
+    token: string
+}
+  

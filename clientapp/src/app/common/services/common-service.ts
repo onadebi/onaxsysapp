@@ -1,5 +1,5 @@
 import appsettings from "../config/appsettings";
-import { AuthProfile } from "../models/AuthProfile";
+import { UserLoginResponse } from "../models/UserLoginResponse";
 
 
 export default class CommonService {
@@ -7,7 +7,7 @@ export default class CommonService {
     error: string | null = null;
     token: string | null = window.localStorage.getItem('jwt');
     appLoaded = false;
-    
+
     LogError = (error: string, obj?: object | string | undefined) => {
         if (obj) {
             console.error(`[${appsettings.appName}] ERROR :`, error, obj);
@@ -16,7 +16,7 @@ export default class CommonService {
         }
     }
 
-    LogActivity = (prop: string| object, obj?: object | undefined) => {
+    LogActivity = (prop: string | object, obj?: object | undefined) => {
         if (obj) {
             console.log(`[${appsettings.appName}] INFO :`, prop, obj);
         } else {
@@ -28,22 +28,15 @@ export default class CommonService {
         this.error = error;
     }
 
-    // setToken = (token: string | null) => {
-    //     // if(token){
-    //     //     window.localStorage.setItem('jwt', token ? token : "");
-    //     //     this.token = token;
-    //     // }else{
-    //     //     window.localStorage.removeItem('jwt');
-    //     //     this.token = null;
-    //     // }
-    // }
+    setLocaStoragae = (tokenKey: string, tokenValue: string) =>(window.localStorage.setItem(tokenKey, tokenValue));
+    removeLocalStorage = (tokenKey: string) =>(window.localStorage.removeItem(tokenKey));
 
     // Function to set a session cookie
     setSessionCookie = (name: string, value: string) => {
         window.document.cookie = `${name}=${value}; path=/`;
     }
 
-    setSessionCookieUserProfileToBtoa = (userProf: AuthProfile, userSession: string = '_onx_appuser_session') => {
+    setSessionCookieUserProfileToBtoa = (userProf: UserLoginResponse, userSession: string = '_onx_appuser_session') => {
         window.document.cookie = `${userSession}=${btoa(JSON.stringify(userProf))}; path=/`;
     }
 
@@ -57,7 +50,7 @@ export default class CommonService {
         return null;
     }
 
-    getSessionCookieUserProfileToBtoa = (userSession: string = '_onx_appuser_session'): (AuthProfile | null) => {
+    getSessionCookieUserProfileToBtoa = (userSession: string = '_onx_appuser_session'): (UserLoginResponse | null) => {
         let decoded: string;
         //TODO: Local JWT decode validation (expired, tampered, etc)
         const cookieArr = window.document.cookie.split("; ");
@@ -65,27 +58,27 @@ export default class CommonService {
             const [key, value] = cookie.split("=");
             if (key === userSession) {
                 decoded = atob(value);
-                const authProfile = decoded as unknown as AuthProfile;
+                const authProfile = decoded as unknown as UserLoginResponse;
                 return authProfile;//JSON.parse(authProfile);
             }
         }
         return null;
     }
 
-    // fetchValidLocalAuthProfileFromBtoa = (token: string = 'token'): (AuthProfile | null) => {
+    // fetchValidLocalAuthProfileFromBtoa = (token: string = 'token'): (UserLoginResponse | null) => {
     //     const userAuth = window.localStorage.getItem(token);
     //     let decoded: string;
     //     //TODO: Local JWT decode validation (expired, tampered, etc)
     //     if (userAuth) {
     //         decoded = ""; //atob(userAuth);
-    //         const authProfile = decoded;//as unknown as AuthProfile;
+    //         const authProfile = decoded;//as unknown as UserLoginResponse;
     //         return JSON.parse(authProfile);
     //     } else {
     //         return null;
     //     }
     // }
 
-    setLocalAuthProfileToBtoa = (userProf: AuthProfile, token: string = 'token') => {
+    setLocalAuthProfileToBtoa = (userProf: UserLoginResponse, token: string = 'token') => {
         window.localStorage.setItem(token, btoa(JSON.stringify(userProf)));
     }
 

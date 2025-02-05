@@ -9,8 +9,6 @@ import Search from "../../components/Search";
 import './posts.css';
 import { appServices, useAppStore } from "../../../common/services/appservices";
 import { BlogCategory } from "../../models/blog_categories";
-import PostMenuActions from "../../components/PostMenuActions";
-import Comments from "../../components/Comments";
 import { BlogPost } from "../../models/blog_post";
 import { useLocation } from "react-router-dom";
 
@@ -68,10 +66,7 @@ const SinglePostPage: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-12 justify-between">
         {/* text */}
         <div className="lg:text-lg flex flex-col gap-6 text-justify">
-          <div dangerouslySetInnerHTML={{ __html: post?.content ?? '' }} />
-           {/* Comments */}
-          <Comments postId={`45`} comment={{_id:`45`, createdAt:(new Date(2024, 11,12)).toDateString(), desc:`lorem on web design`, user:{img: userImg, username: 'onadebi'}}} />
-        </div>
+          <div dangerouslySetInnerHTML={{ __html: post?.content ?? '' }} /> </div>
         {/* menu */}
         <div className="px-4 h-max stickyPoint">
           <h1 className="mb-4 text-sm font-medium">Author</h1>
@@ -99,7 +94,6 @@ const SinglePostPage: React.FC = () => {
               </RouteTo>
             </div>
           </div>
-          <PostMenuActions post={{}}/>
           <h1 className="mt-8 mb-4 text-sm font-medium">Categories</h1>
           <div className="flex flex-col gap-2 text-sm">
             <RouteTo to={``} className="underline">All</RouteTo>

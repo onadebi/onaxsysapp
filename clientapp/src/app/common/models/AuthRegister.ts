@@ -1,4 +1,4 @@
-import { SocialLogin } from "./AuthProfile"
+import { SocialLogin } from "./UserLoginResponse"
 
 export type AuthRegister =  {
     firstName: string

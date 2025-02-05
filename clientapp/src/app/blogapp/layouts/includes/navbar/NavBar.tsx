@@ -4,13 +4,18 @@ import React from 'react';
 import appsettings from '../../../../common/config/appsettings';
 import RouteTo from '../../../../_components/RouteTo';
 import BlogAppRoutes from '../../../BlogAppRoutes';
-import { SignedOut, SignedIn, UserButton } from '@clerk/clerk-react';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../../../../store/storeKeeper';
+import { useAppStore } from '../../../../common/services/appservices';
+import { useNavigate } from 'react-router-dom';
 
 const NavBar = () => {
   const [menuControl, setMenuControl] = React.useState(false);
-  const userProfile = useSelector((state: RootState) => state.auth);
+  const {authService} = useAppStore();
+  const navigate = useNavigate();
+
+  const LogOut = async () => {
+    const objResp = await authService.logout();
+    if(objResp){navigate(BlogAppRoutes().public.login.parentRoute);}
+  }
 
   return (
     <>
@@ -27,19 +32,20 @@ const NavBar = () => {
             <li><RouteTo to={BlogAppRoutes().public.posts.parentRoute}>Posts</RouteTo> </li>
             <li><RouteTo to={"/about"}>About</RouteTo> </li>
             <li><RouteTo to={"#"}>Free tools</RouteTo></li> */}
-            <li>
-              <SignedOut>
-                {/* <RouteTo to={BlogAppRoutes().public.register.parentRoute} className='rounded-xl bg-onaxSky px-3 py-2'>Register👋</RouteTo> */}
-                &nbsp;
-                <RouteTo to={BlogAppRoutes().public.login.parentRoute} className='rounded-xl bg-onaxPurple px-3 py-2'>Login🗝️</RouteTo>
-              </SignedOut>
+            <li>              
+              {
+                authService.UserProfile().isSuccess 
+                ? 
+                <>
+                    <RouteTo to={BlogAppRoutes().dashboard.home.parentRoute} className='rounded-xl bg-onaxPurple px-3 py-2'>Dashboard🚀</RouteTo>
+                    <span className='cursor-pointer' title={`logout ${authService.UserProfile().result?.firstName}`} onClick={LogOut}>Logout out</span> 
+                </>
+                : <RouteTo to={BlogAppRoutes().public.login.parentRoute} className='rounded-xl bg-onaxPurple px-3 py-2'>Login🗝️</RouteTo>
+              }
             </li>
         </ul>
         <section className='flex gap-4'>
-            <SignedIn>
-                <UserButton />
-            </SignedIn>
-            {userProfile && userProfile.roles ? <>{userProfile.roles.some(r=> ['admin'].includes(r)) ? <RouteTo to={BlogAppRoutes().dashboard.home.parentRoute}>{userProfile.firstName}</RouteTo> : null}</>: null}
+            {authService.UserProfile().isSuccess && authService.UserProfile().result?.roles ? <>{authService.UserProfile().result?.roles.some(r=> ['admin'].includes(r)) ? <RouteTo to={BlogAppRoutes().dashboard.home.parentRoute}>{authService.UserProfile().result?.firstName}</RouteTo> : null}</>: null}
         </section>
     </div>
     <div className="md:hidden">
