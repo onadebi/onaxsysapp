@@ -1,6 +1,8 @@
-import { NavLink } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 import AppRoutes from "../../routes/AppRoutes";
 import { appServices } from "../common/services/appservices";
+import RouteTo from "./RouteTo";
+import { useEffect, useState } from "react";
 
 
 const LogOut = async (evt: React.MouseEvent<HTMLAnchorElement, MouseEvent>) => {
@@ -62,18 +64,26 @@ const menuItems = [
 ];
 
 const Menu: React.FC = () => {
+
+    const {pathname} = useLocation();
+    const [path, setPath] = useState(pathname);
+    useEffect(()=>{
+        setPath(pathname);
+    },[pathname]);
+
+    
   return (
     <div className="">
       {menuItems.map((menu) => (
         <div className="" key={menu.title}>
-          <span className="hidden lg:block text-gray-400 font-light my-2 pl-2">{menu.title}</span>
+          <span className="hidden lg:block text-gray-400 font-light my-2 border-l-[4px] border-l-gray-400 pl-2 ml-1">{menu.title}</span>
           {menu.items.map((item, index) => {
             if(item.visible.some(r => role.includes(r))) {
               return (
-                <NavLink to={item.href} className="flex items-center justify-center lg:justify-start gap-2 text-gray-500 py-2 md:px-2 rounded-md hover:bg-onaxSky" key={index}>
+                <RouteTo to={item.href} className={`flex items-center justify-center border-b-[1px] border-black-300 lg:justify-start gap-2 text-gray-500 py-2 md:px-2 rounded-md hover:bg-onaxSky ${path === item.href ? 'bg-onaxPurple':''}`} key={index}>
                   <img src={item.icon} alt={item.label} title={item.label} width={20} height={20} />
                   <span className="hidden lg:block whitespace-nowrap" onClick={item.onClick}>{item.label}</span>
-                </NavLink>
+                </RouteTo>
               );
             }
             return null;

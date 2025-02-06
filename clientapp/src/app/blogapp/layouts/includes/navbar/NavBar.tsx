@@ -47,7 +47,7 @@ const NavBar = () => {
 
   return (
     <>
-    <nav className="w-full h-16 md:h-20 flex items-center justify-between relative bg-white">
+    <nav className="w-full h-16 md:h-20 flex items-center justify-between relative bg-white border-b-1 shadow-md">
     <div className="flex items-center gap-4 text-2xl font-bold" id="btnMenu">
         <a href={BlogAppRoutes().public.home.parentRoute}><img src={logo} alt={appsettings.appName} title={appsettings.appName} srcSet="" style={{width:'200px', marginLeft:'50px'}} loading='lazy'/></a>
         <span style={{lineHeight: 'initial', color: 'rgb(8, 29, 86)', fontWeight: 'bolder', fontSize: '2em'}}><span
