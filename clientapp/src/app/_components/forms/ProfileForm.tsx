@@ -67,7 +67,7 @@ const ProfileForm: React.FC<IPropsTableForm<UserLoginResponseUpdateDTO>> = ({typ
               {errors?.img?.message && (<p className='text-xs text-red-400 w-full text-center'>{errors?.img?.message}</p>)}
           </div>
         </div>
-        <button className='border-none rounded-md  px-4 py-2 text-white bg-onaxBlue font-semibold'>{type === 'update' ? "Update" : "Update"}</button>
+        <button className='border-none rounded-md  px-4 py-2 text-white bg-onaxBlue font-semibold'>{type === 'update' ? "Update" : "Create"}</button>
     </form>
     </>
   )
