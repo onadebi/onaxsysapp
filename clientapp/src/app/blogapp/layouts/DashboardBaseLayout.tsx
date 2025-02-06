@@ -45,7 +45,7 @@ const DashboardBaseLayout: React.FC = () => {
         {/* <div className="px-4 md:px-8 lg:px-4 lx:px-28 2xl:px-6"> */}
         <div className="">
           <div className='flex'>
-              <aside className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] bg-white h-[100vh]">
+              <aside className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] bg-white h-[100vh] border-r-[#ececec] border-r-2 shadow-lg">
                 <RouteTo to={AppRoutes().dashboard.home.parentRoute}
                   className="flex items-center justify-center lg:justify-start gap-2 p-4">
                   <img src="/assets/images/logo.png" alt="Logo" width={32} height={32} />
@@ -60,7 +60,7 @@ const DashboardBaseLayout: React.FC = () => {
               ))
             }
             </aside> */}
-            <div className='w-full p-1'>
+            <div className='w-full p-1 bg-slate-50'>
               <Outlet />
             </div>
           </div>
