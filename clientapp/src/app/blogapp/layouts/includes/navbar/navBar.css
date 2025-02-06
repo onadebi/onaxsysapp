@@ -27,13 +27,20 @@ ul.menuOptions li{
 ul.menuOptions li a{
     text-decoration: none;
 }
-
 ul.menuOptions li a:hover{
     border-bottom: 2px solid #ececec;
 }
 
 .main-nav span {
     flex: 1;
+}
+
+ul.userprofile_menu li{
+    margin:2px 0px !important;
+    padding: 5px 20px; 
+}
+ul.userprofile_menu li:hover{
+    background-color: #ececec;
 }
 
 @media (max-width: 768px) {

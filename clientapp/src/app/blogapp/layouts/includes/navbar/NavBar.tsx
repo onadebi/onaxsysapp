@@ -1,13 +1,15 @@
 import './navBar.css';
 import logo from '../../../../../assets/images/logo_.png';
-import React, {useState } from 'react';
+import React, {useEffect, useRef, useState } from 'react';
 import appsettings from '../../../../common/config/appsettings';
 import RouteTo from '../../../../_components/RouteTo';
 import BlogAppRoutes from '../../../BlogAppRoutes';
 import { useAppStore } from '../../../../common/services/appservices';
 import { useNavigate } from 'react-router-dom';
-import avatar from '../../../../../../public/assets/images/avatar.png';
-import FormModal from '../../../../_components/FormModal';
+import avatar from '../../../../../assets/images/avatar.png';
+import logout from '../../../../../assets/images/logout.png';
+import setting from '../../../../../assets/images/setting.png';
+import FormModalControlled from '../../../../_components/FormModalControlled';
 import { UserLoginResponseUpdateDTO } from '../../../../common/models/UserLoginResponse';
 
 const NavBar = () => {
@@ -16,9 +18,25 @@ const NavBar = () => {
   const navigate = useNavigate();
   const [userProfileNavDisplay, setUserProfileNavDisplay] = React.useState(false);
   const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const avatarRef = useRef<HTMLImageElement>(null);
  
+  useEffect(() => {
+    const handleClickOutside = (evt: MouseEvent) => {
+      if (userProfileNavDisplay &&
+          dropdownRef.current && 
+          !dropdownRef.current.contains(evt.target as Node) && avatarRef.current && !avatarRef.current.contains(evt.target as Node)) {
+            setUserProfileNavDisplay(false);
+        }
+    };
 
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [userProfileNavDisplay]);
 
+  
   const LogOut = async () => {
     const confirmLogout = window.confirm('Are you sure you want to logout?');
     if(!confirmLogout){setUserProfileNavDisplay(false); return;}
@@ -44,22 +62,23 @@ const NavBar = () => {
                 ? 
                 <aside className='flex items-center gap-[1rem]'>
                     <RouteTo to={BlogAppRoutes().dashboard.home.parentRoute} className='rounded-xl bg-onaxPurple px-3 py-2'>Dashboard🚀</RouteTo>
-                    <span className='cursor-pointer relative' title={`l${authService.UserProfile().result?.firstName}`}>
-                    <img src={avatar} alt='avatar' className='rounded-full w-8 h-8' onClick={()=> setUserProfileNavDisplay(prev=> !prev)} />
-                        <div className={`bg-green-300 absolute top-19 right-0 rounded-md mt-2 p-2 ${!userProfileNavDisplay && 'hidden'}`} style={{whiteSpace:'nowrap'}} >
-                            <ul>
-                                <li>
+                    <span className='cursor-pointer relative' title={`${authService.UserProfile().result?.firstName}`}>
+                    <img src={avatar} alt='avatar' ref={avatarRef} className='rounded-full w-8 h-8' onClick={()=> setUserProfileNavDisplay(prev=> !prev)} />
+                        <div ref={dropdownRef} className={`border bg-[white] absolute top-19 right-0 rounded-md mt-2 min-w-[250px] overflow-hidden ${!userProfileNavDisplay && 'hidden'}`} style={{whiteSpace:'nowrap'}} >
+                            <ul className='userprofile_menu'>
+                                <li className='flex items-center gap-2'>
+                                    <img src={setting} alt='avatar' className='rounded-full w-4 h-4' />
                                     <span onClick={() =>{ setIsFormModalOpen(true); setUserProfileNavDisplay(false)}}>Manage account</span>
                                 </li>
-                                <li  title={`logout`} onClick={LogOut}>
+                                <li title={`logout`} onClick={LogOut}  className='flex items-center gap-2'>
+                                    <img src={logout} alt='avatar' className='rounded-full w-4 h-4' />
                                     Sign out
                                 </li>
-                                <li></li>
                             </ul>
                         </div>
                     </span> 
                     <span>
-                    <FormModal id={`rgdtee-54444ye-365643-we56356`} table='userProfile' type='update' title={`Edit User profile`} data={{} as UserLoginResponseUpdateDTO}
+                    <FormModalControlled id={`rgdtee-54444ye-365643-we56356`} table='userProfile' type='update' title={`Edit User profile`} data={{} as UserLoginResponseUpdateDTO}
                     open={isFormModalOpen}
                     onClose={() => setIsFormModalOpen(false)} />
                     </span>

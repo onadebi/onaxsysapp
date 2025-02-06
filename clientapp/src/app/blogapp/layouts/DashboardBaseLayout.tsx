@@ -8,36 +8,8 @@ import { Outlet, useNavigate } from 'react-router-dom';
 // import { useDispatch, useSelector } from 'react-redux';
 import { useAppStore } from '../../common/services/appservices';
 import GenResponse from '../../common/config/GenResponse';
-
-
-const DashboardCards: React.FC<{ title: string; url: string }> = ({
-  title,
-  url,
-}) => {
-  return (
-    <>
-      <div className="bg-white shadow-md rounded-md p-4 min-w-[200px]">
-        <RouteTo to={url} className="text-blue-800">
-          <h3 className="text-lg font-semibold">{title}</h3>
-        </RouteTo>
-      </div>
-    </>
-  );
-};
-
-// const permittedRoles = ['admin'];
-const operations = [
-  {
-    title: "Home",
-    url: BlogAppRoutes().dashboard.home.parentRoute,
-    order: 0,
-  },
-  {
-    title: "Create Post",
-    url: BlogAppRoutes().dashboard.write.parentRoute,
-    order: 1,
-  },
-];
+import Menu from '../../_components/Menu';
+import AppRoutes from '../../../routes/AppRoutes';
 
 
 const DashboardBaseLayout: React.FC = () => {
@@ -70,15 +42,24 @@ const DashboardBaseLayout: React.FC = () => {
       {loading ? <LoaderGeneric display={true}/> : 
         <>
         <NavBar />
-        <div className="px-4 md:px-8 lg:px-4 lx:px-28 2xl:px-6">
-          <div className='flex mt-2'>
-            <aside className='hidden md:flex flex-col gap-4 w-1/8 2xl:mr-2 lx:mr-2 lg:mr-2 md:mr-2'>
+        {/* <div className="px-4 md:px-8 lg:px-4 lx:px-28 2xl:px-6"> */}
+        <div className="">
+          <div className='flex'>
+              <aside className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] bg-white h-[100vh]">
+                <RouteTo to={AppRoutes().dashboard.home.parentRoute}
+                  className="flex items-center justify-center lg:justify-start gap-2 p-4">
+                  <img src="/assets/images/logo.png" alt="Logo" width={32} height={32} />
+                  <span className="hidden lg:block">OnaxApp</span>
+                </RouteTo>
+                <Menu />
+             </aside>
+            {/* <aside className='hidden md:flex flex-col gap-4 w-1/8 2xl:mr-2 lx:mr-2 lg:mr-2 md:mr-2'>
             {
               operations.map((op, index) => (
                 <DashboardCards key={index} title={op.title} url={op.url} />
               ))
             }
-            </aside>
+            </aside> */}
             <div className='w-full p-1'>
               <Outlet />
             </div>
