@@ -70,9 +70,8 @@ const DashboardBaseLayout: React.FC = () => {
       {loading ? <LoaderGeneric display={true}/> : 
         <>
         <NavBar />
-        <h3>DashboardBaseLayout</h3>
         <div className="px-4 md:px-8 lg:px-4 lx:px-28 2xl:px-6">
-          <div className='flex'>
+          <div className='flex mt-2'>
             <aside className='hidden md:flex flex-col gap-4 w-1/8 2xl:mr-2 lx:mr-2 lg:mr-2 md:mr-2'>
             {
               operations.map((op, index) => (

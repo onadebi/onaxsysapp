@@ -12,7 +12,6 @@ import { UserLoginTokenPayload } from "../models/UserLoginTokenPayload";
 export class AuthService {
     async logout(): Promise<boolean> {
         let objResp: boolean = false;
-        alert('logging out')
         return new Promise((resolve, reject) => {
             agent.requests.post<boolean>(apiRoutes.auth.logout, {})
                 .then((resp) => {

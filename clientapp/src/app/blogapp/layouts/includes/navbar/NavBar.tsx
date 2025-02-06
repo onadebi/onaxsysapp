@@ -1,21 +1,31 @@
 import './navBar.css';
 import logo from '../../../../../assets/images/logo_.png';
-import React from 'react';
+import React, {useState } from 'react';
 import appsettings from '../../../../common/config/appsettings';
 import RouteTo from '../../../../_components/RouteTo';
 import BlogAppRoutes from '../../../BlogAppRoutes';
 import { useAppStore } from '../../../../common/services/appservices';
 import { useNavigate } from 'react-router-dom';
+import avatar from '../../../../../../public/assets/images/avatar.png';
+import FormModal from '../../../../_components/FormModal';
+import { UserLoginResponseUpdateDTO } from '../../../../common/models/UserLoginResponse';
 
 const NavBar = () => {
   const [menuControl, setMenuControl] = React.useState(false);
   const {authService} = useAppStore();
   const navigate = useNavigate();
+  const [userProfileNavDisplay, setUserProfileNavDisplay] = React.useState(false);
+  const [isFormModalOpen, setIsFormModalOpen] = useState(false);
+ 
+
 
   const LogOut = async () => {
+    const confirmLogout = window.confirm('Are you sure you want to logout?');
+    if(!confirmLogout){setUserProfileNavDisplay(false); return;}
     const objResp = await authService.logout();
     if(objResp){navigate(BlogAppRoutes().public.login.parentRoute);}
   }
+
 
   return (
     <>
@@ -26,20 +36,34 @@ const NavBar = () => {
             style={{color:'rgb(236, 236, 236)'}}>DM</span>
         </span>
     </div>
-    <div className='flex pr-10'>
+    <div className='flex'>
         <ul id="menu_control" className={`menuOptions ${menuControl && 'menuShow'}`}>
-            {/* <li><RouteTo to={BlogAppRoutes().public.home.parentRoute}>Home</RouteTo> </li>
-            <li><RouteTo to={BlogAppRoutes().public.posts.parentRoute}>Posts</RouteTo> </li>
-            <li><RouteTo to={"/about"}>About</RouteTo> </li>
-            <li><RouteTo to={"#"}>Free tools</RouteTo></li> */}
             <li>              
               {
                 authService.UserProfile().isSuccess 
                 ? 
-                <>
+                <aside className='flex items-center gap-[1rem]'>
                     <RouteTo to={BlogAppRoutes().dashboard.home.parentRoute} className='rounded-xl bg-onaxPurple px-3 py-2'>Dashboard🚀</RouteTo>
-                    <span className='cursor-pointer' title={`logout ${authService.UserProfile().result?.firstName}`} onClick={LogOut}>Logout out</span> 
-                </>
+                    <span className='cursor-pointer relative' title={`l${authService.UserProfile().result?.firstName}`}>
+                    <img src={avatar} alt='avatar' className='rounded-full w-8 h-8' onClick={()=> setUserProfileNavDisplay(prev=> !prev)} />
+                        <div className={`bg-green-300 absolute top-19 right-0 rounded-md mt-2 p-2 ${!userProfileNavDisplay && 'hidden'}`} style={{whiteSpace:'nowrap'}} >
+                            <ul>
+                                <li>
+                                    <span onClick={() =>{ setIsFormModalOpen(true); setUserProfileNavDisplay(false)}}>Manage account</span>
+                                </li>
+                                <li  title={`logout`} onClick={LogOut}>
+                                    Sign out
+                                </li>
+                                <li></li>
+                            </ul>
+                        </div>
+                    </span> 
+                    <span>
+                    <FormModal id={`rgdtee-54444ye-365643-we56356`} table='userProfile' type='update' title={`Edit User profile`} data={{} as UserLoginResponseUpdateDTO}
+                    open={isFormModalOpen}
+                    onClose={() => setIsFormModalOpen(false)} />
+                    </span>
+                </aside>
                 : <RouteTo to={BlogAppRoutes().public.login.parentRoute} className='rounded-xl bg-onaxPurple px-3 py-2'>Login🗝️</RouteTo>
               }
             </li>

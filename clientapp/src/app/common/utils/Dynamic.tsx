@@ -1,15 +1,15 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, {lazy, Suspense, ComponentType} from 'react';
 
-interface DynamicImportProps{
+interface DynamicImportProps<T> {
     fallback: React.ReactNode;
-}
+    type?: T;
+  }
 
-const Dynamic = (importFunc: () => Promise<{default: ComponentType<any>}>, {fallback}:DynamicImportProps) => {
+const Dynamic =<T extends object> (importFunc: () => Promise<{default: ComponentType<T>}>, {fallback}:DynamicImportProps<T>) => {
     const LazyComponent = lazy(importFunc);
-    return (props: any)=> (
+    return (props: T)=> (
         <Suspense fallback={fallback}>
-            <LazyComponent {...props} />
+            <LazyComponent {...(props as T)} />
         </Suspense>
     );
 }

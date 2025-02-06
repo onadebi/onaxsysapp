@@ -1,3 +1,4 @@
+
 export type UserLoginResponse = {
     firstName: string;
     lastName: string;
@@ -14,5 +15,9 @@ export interface SocialLogin {
     socialLoginAppName: string
     app_id: string;
     token: string
+}
+
+export type UserLoginResponseUpdateDTO =  Omit<UserLoginResponse,'socialLogin'|'token'|'roles'> & {
+    sex: 'male' | 'female'| 'unspecified';
 }
   
