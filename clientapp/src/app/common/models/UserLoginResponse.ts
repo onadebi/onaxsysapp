@@ -21,3 +21,7 @@ export type UserLoginResponseUpdateDTO =  Omit<UserLoginResponse,'socialLogin'|'
     sex: 'male' | 'female'| 'unspecified';
 }
   
+export type UserAccountCreateDTO = Omit<UserLoginResponse,'socialLogin'|'token'|'roles'|'guid'|'id'> & {
+    password: string;
+    confirmPassword: string;
+}

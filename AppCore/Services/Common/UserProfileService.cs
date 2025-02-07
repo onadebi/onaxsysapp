@@ -34,18 +34,18 @@ public class UserProfileService : IUserProfileService
         this._mapper = mapper;
     }
 
-    public async Task<GenResponse<UserLoginResponse?>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default)
+    public async Task<GenResponse<UserLoginResponse>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default)
     {
         if (user == null)
         {
-            return GenResponse<UserLoginResponse?>.Failed("Invalid fields passed.");
+            return GenResponse<UserLoginResponse>.Failed("Invalid fields passed.");
         }
         if (user.Password != user.ConfirmPassword)
         {
-            return GenResponse<UserLoginResponse?>.Failed("Passwords don't match.");
+            return GenResponse<UserLoginResponse>.Failed("Passwords don't match.");
         }
         user.Email = user.Email.ToLower();
-        GenResponse<UserLoginResponse?> objResp = new();
+        GenResponse<UserLoginResponse> objResp = new();
         try
         {
             var isExist = await _context.UserProfiles.FirstOrDefaultAsync(m => m.Email == user.Email, ct);
@@ -61,7 +61,7 @@ public class UserProfileService : IUserProfileService
             };
             if (isExist != null)
             {
-                return GenResponse<UserLoginResponse?>.Failed("Another user registered with this email already exists.");
+                return GenResponse<UserLoginResponse>.Failed("Another user registered with this email already exists.");
             }
             if (user.Password == user.ConfirmPassword)
             {
@@ -69,7 +69,7 @@ public class UserProfileService : IUserProfileService
             }
             else
             {
-                return GenResponse<UserLoginResponse?>.Failed("Invalid registration. Passwords don't match.");
+                return GenResponse<UserLoginResponse>.Failed("Invalid registration. Passwords don't match.");
             }
             await _context.UserProfiles.AddAsync(userProfileParams, ct);
             UserApp userApp = new()
@@ -90,7 +90,7 @@ public class UserProfileService : IUserProfileService
                     Email = user.Email.ToLower(),
                     FirstName = user.FirstName,
                     LastName = user.LastName,
-                    Roles = userProfileParams.Roles != null ? [.. userProfileParams.Roles] : [],
+                    Roles = [..userApp.UserRole],
                     Guid = userProfileParams.Guid,
                     Id = userProfileParams.Id,
                     Picture = userProfileParams.UserProfileImage
@@ -101,11 +101,11 @@ public class UserProfileService : IUserProfileService
 
                 #region EMAIL CONFIRMATION
                 string confirmationToken = Guid.NewGuid().ToString();
-                string EmailBody = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "AppCore", "Templates", "ConfirmEmail.html"))
+                string EmailBody = File.ReadAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Templates", "ConfirmEmail.html"))
                         .Replace("##token##", confirmationToken)
                         .Replace("##name##", user.FirstName)
                         .Replace("##guid##", objResp.Result.Guid);
-                EmailModelDTO emailBody = new EmailModelDTO()
+                EmailModelDTO emailBody = new ()
                 {
                     ReceiverEmail = user.Email,
                     EmailSubject = MessageOperations.ConfirmEmail,
@@ -130,13 +130,13 @@ public class UserProfileService : IUserProfileService
             }
             else
             {
-                return GenResponse<UserLoginResponse?>.Failed("Unable to complete. Kindly try again.");
+                return GenResponse<UserLoginResponse>.Failed("Unable to complete. Kindly try again.");
             }
         }
         catch (Exception ex)
         {
             _logger.LogError(ex, $"ERROR in [{caller}]: Occured while registering user: " + user.Email);
-            return GenResponse<UserLoginResponse?>.Failed("An internal error occured. Kindly try again.");
+            return GenResponse<UserLoginResponse>.Failed("An internal error occured. Kindly try again.");
         }
         return objResp;
     }
@@ -307,7 +307,7 @@ public class UserProfileService : IUserProfileService
 
 public interface IUserProfileService
 {
-    Task<GenResponse<UserLoginResponse?>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default);
+    Task<GenResponse<UserLoginResponse>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<UserLoginResponse>> Login(UserLoginDto userLogin, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<UserLoginResponse>> GoogleLogin(string token, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<GoogleOAuthResponse>> VerfiyGoogleAuth(string token);
