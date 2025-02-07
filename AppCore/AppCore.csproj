@@ -7,6 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="Templates\ConfirmEmail.html" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Google.Apis.Auth" Version="1.69.0" />
 		<PackageReference Include="Hangfire.PostgreSql" Version="1.20.10" />
 		<PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.1" />
@@ -21,6 +25,18 @@
 
 	<ItemGroup>
 		<Folder Include="Domain\AppCore\Config\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Resource Include="Templates\ConfirmEmail.html">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </Resource>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="Templates\ForgottenPasswordRequest.html">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

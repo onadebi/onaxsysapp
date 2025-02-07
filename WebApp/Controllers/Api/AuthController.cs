@@ -50,12 +50,15 @@ namespace WebApp.Controllers.Api
         [ProducesResponseType(typeof(GenResponse<UserLoginResponse>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Register(UserModelCreateDto user)
         {
-            var objResp = await this._userProfileSvc.RegisterUser(user);
-            if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result?.Email))
-            {
-                objResp.Result.token = _tokenService.CreateAppToken(new AppUserIdentity() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles] }, out List<Claim> _);
-                return Ok(objResp);
-            }
+            GenResponse<UserLoginResponse> objResp = await this._userProfileSvc.RegisterUser(user);
+            #region OBSOLETE
+            // if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result?.Email))
+            // {
+            //     objResp.Result.token = _tokenService.CreateAppToken(new AppUserIdentity() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles] }, out List<Claim> _);
+            //     return Ok(objResp);
+            // }
+            #endregion
+            objResp = await LoginContextTokenHelper(objResp);
             return Ok(objResp); ;
         }
 

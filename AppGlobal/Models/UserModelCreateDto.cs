@@ -18,7 +18,7 @@ namespace AppGlobal.Models
 
         public string? UserProfileImage { get; set; }
 
-        public required SocialLogin SocialLogin { get; set; }
+        // public SocialLogin? SocialLogin { get; set; }
 
     }
 
