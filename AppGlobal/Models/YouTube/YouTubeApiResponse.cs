@@ -28,6 +28,7 @@ public class Id
 {
     public string kind { get; set; } = string.Empty;
     public string videoId { get; set; } = string.Empty;
+    public string videoUrlComplete { get; set; } = string.Empty;
 }
 
 public class Item

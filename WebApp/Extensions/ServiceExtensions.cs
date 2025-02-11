@@ -49,6 +49,12 @@ public static class ServiceExtensions
             options.AzureBlobConfig.BlobStoragePath = BlobStoragePath;
             options.ExternalAPIs.GeminiApi.GeminiApiApiKey = GeminiApiKey;
             options.ExternalAPIs.YoutubeApi.YoutubeApiKey = YoutubeApiKeyEnv;
+
+            #region SpeechSynthesis
+            options.SpeechSynthesis.SpeechKey = Environment.GetEnvironmentVariable("SpeechKey", EnvironmentVariableTarget.Process) ?? string.Empty;
+            options.SpeechSynthesis.SpeechEndpoint = Environment.GetEnvironmentVariable("SpeechEndpoint", EnvironmentVariableTarget.Process) ?? string.Empty;
+            options.SpeechSynthesis.SpeechLocation = Environment.GetEnvironmentVariable("SpeechLocation", EnvironmentVariableTarget.Process) ?? string.Empty;
+            #endregion
         });
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
@@ -213,6 +219,8 @@ public static class ServiceExtensions
         services.AddScoped<IPostCategoryService, PostCategoryService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
+        services.AddScoped<ISpeechService, SpeechService>();
+        services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         services.AddScoped<IFileManagerHelperService, FileManagerHelperService>();
 
         builder.Services.AddScoped<IGeminiService>((svcProv) =>
@@ -220,6 +228,12 @@ public static class ServiceExtensions
             return new GeminiService(svcProv.GetRequiredService<IHttpClientFactory>()
                 , svcProv.GetRequiredService<IOptions<AppSettings>>(), svcProv.GetRequiredService<IMapper>());
         });
+        builder.Services.AddScoped<IYouTubeService>((svcProv) =>
+        {
+            return new YouTubeService(svcProv.GetRequiredService<IHttpClientFactory>()
+                , svcProv.GetRequiredService<IOptions<AppSettings>>(), svcProv.GetRequiredService<IMapper>());
+        });
+
 
         services.AddScoped<IMessageService, MessageService>();
 
@@ -228,7 +242,6 @@ public static class ServiceExtensions
             , Factories<MessageBrokerService>.AppLoggerFactory(svcP.GetRequiredService<IConfiguration>()))
         );
         //services.AddScoped<IUserServiceRepository, UserServiceRepository>();
-        //services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         //services.AddScoped<IUserGroupRepository, UserGroupRepository>();
 
         //services.AddScoped<IMenuRepository, MenuRepository>();

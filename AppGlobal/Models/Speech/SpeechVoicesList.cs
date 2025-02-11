@@ -1,4 +1,4 @@
-﻿namespace AppGlobal.Config;
+﻿namespace AppGlobal.Models.Speech;
 
 public static class SpeechVoicesDto
 {

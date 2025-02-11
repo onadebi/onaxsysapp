@@ -22,6 +22,10 @@ services:
       - BlobReadAccessYear2099=${BlobReadAccessYear2099}
       - BlobStoragePath=${BlobStoragePath}
       - GoogleOAuthClientId=${GoogleOAuthClientId}
+      - SpeechKey=${SpeechKey}
+      - SpeechEndpoint=${SpeechEndpoint}
+      - SpeechLocation=${SpeechLocation}
+      - SmtpPassword=${SmtpPassword}
     ports:
         - "5000:80"
         - "5001:443" 

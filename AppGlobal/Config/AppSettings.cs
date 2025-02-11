@@ -12,6 +12,7 @@ public class AppSettings
     public AzureBlobConfig AzureBlobConfig { get; set; } = default!;
     public required ExternalAPIs ExternalAPIs { get; set; }
     public required SessionConfig SessionConfig { get; set; }
+    public SpeechSynthesis SpeechSynthesis { get; set; }
     public required Prompts Prompts { get; set; }
 }
 
@@ -44,6 +45,13 @@ public class GeminiApi : UrlGeneric
 public class YoutubeApi : UrlGeneric
 {
     public string YoutubeApiKey { get; set; } = string.Empty;
+}
+
+public class SpeechSynthesis
+{
+    public required string SpeechKey { get; set; }
+    public required string SpeechEndpoint { get; set; }
+    public string SpeechLocation { get; set; }=  string.Empty;
 }
 public class AzureBlobConfig
 {
