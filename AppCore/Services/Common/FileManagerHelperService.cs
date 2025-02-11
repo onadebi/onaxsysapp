@@ -45,7 +45,7 @@ public class FileManagerHelperService : IFileManagerHelperService
             var blobSvcClient = new BlobServiceClient(blobConstring);
 
             var containerClient = blobSvcClient.GetBlobContainerClient(containerName);
-            var blob = containerClient.GetBlobClient(Path.Combine("course_images",fileName));
+            var blob = containerClient.GetBlobClient(Path.Combine("course_images", fileName));
 
             using Stream stream = new FileStream(path, FileMode.Open);
             var saveResponse = await blob.UploadAsync(stream, ct);
@@ -59,6 +59,53 @@ public class FileManagerHelperService : IFileManagerHelperService
                 objResp.Message = $"{fileName}|{saveResponse.GetRawResponse().ClientRequestId}";
                 objResp.Result = $"{fileName}|{AppBlobCloudFilePath(blob.Uri.AbsoluteUri)}";
                 OnaxTools.Logger.LogInfo($"[UploadSingleFileToAzBlobStorage][{nameof(UploadSingleFileToAzBlobStorage)}] Uploaded successfully {saveResponse.Value.BlobSequenceNumber}!");
+            }
+            #endregion
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex.Message, ex);
+            return GenResponse<string>.Failed($"ERROR: {ex.Message}");
+        }
+        return objResp;
+    }
+
+
+    public async Task<GenResponse<string>> UploadFileToAzBlobAsync(IFormFile file, string path = "", CancellationToken ct = default!)
+    {
+        GenResponse<string> objResp = new() { IsSuccess = false };
+
+        if (file == null || file.Length == 0)
+        {
+            objResp.Message = objResp.Error = "File is null or empty.";
+            objResp.IsSuccess = false;
+            objResp.Result = string.Empty;
+            objResp.StatCode = (int)StatusCodes.Status400BadRequest;
+            return objResp;
+        }
+
+        try
+        {
+            #region AzureBlob storage
+            var containerName = _appsettings.AzureBlobConfig?.DefaultContainerName;
+            var blobConstring = _appsettings.AzureBlobConfig?.BlobStorageConstring;
+            var blobSvcClient = new BlobServiceClient(blobConstring);
+
+            var containerClient = blobSvcClient.GetBlobContainerClient(containerName);
+            var blob = containerClient.GetBlobClient(Path.Combine(_appsettings.AppName, $"{Guid.NewGuid()}_{file.FileName}"));
+
+            using Stream stream = file.OpenReadStream();
+            var saveResponse = await blob.UploadAsync(stream, ct);
+            if (saveResponse.GetRawResponse().Status != 201)
+            {
+                OnaxTools.Logger.LogInfo($"[UploadFileToAzBlobAsync][{nameof(UploadFileToAzBlobAsync)}] Error uploading document {file.Name} to container {containerName}");
+            }
+            else
+            {
+                objResp.IsSuccess = true;
+                objResp.Message = $"{file.FileName}|{saveResponse.GetRawResponse().ClientRequestId}";
+                objResp.Result = $"{file.FileName}|{AppBlobCloudFilePath(blob.Uri.AbsoluteUri)}";
+                OnaxTools.Logger.LogInfo($"[UploadFileToAzBlobAsync][{nameof(UploadFileToAzBlobAsync)}] Uploaded successfully {saveResponse.Value.BlobSequenceNumber}!");
             }
             #endregion
         }
@@ -116,6 +163,7 @@ public class FileManagerHelperService : IFileManagerHelperService
 public interface IFileManagerHelperService
 {
     Task<GenResponse<string>> UploadSingleFileToAzBlobStorage(IFormFile file, string path = "", CancellationToken ct = default!);
+    Task<GenResponse<string>> UploadFileToAzBlobAsync(IFormFile file, string path = "", CancellationToken ct = default!);
     Task<GenResponse<string>> DeleteSingleFileFromAzBlobStorage(string fileName, CancellationToken ct = default!);
     string AppBlobCloudFilePath(string fileName);
 }
