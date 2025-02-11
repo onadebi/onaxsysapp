@@ -18,6 +18,7 @@ using System.Text.Json;
 using AppCore.Config;
 using AutoMapper;
 using Microsoft.OpenApi.Models;
+using OnaxTools.Enums.Http;
 
 namespace WebApp.Extensions;
 
@@ -161,15 +162,14 @@ public static class ServiceExtensions
         services.AddAuthentication(opt =>
         {
             #region for Cookie based MVC controller routes authentication
-            opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             opt.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            //opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            //opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             //opt.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             #endregion
 
 
             #region FOR jwt
-            //opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             #endregion
         })
@@ -180,17 +180,10 @@ public static class ServiceExtensions
             x.LoginPath = "/home/Login";
             x.AccessDeniedPath = "/home/Login";
         })
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,options =>
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
             byte[] key = Array.Empty<byte>();
-            if (builder.Environment.IsDevelopment())
-            {
-                key = Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("AppSettings:Encryption:Key") ?? "");
-            }
-            else
-            {
-                key = Encoding.UTF8.GetBytes(encryptionKey);
-            }
+            key = Encoding.UTF8.GetBytes(encryptionKey);
             options.RequireHttpsMetadata = false;
             options.SaveToken = false;
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -221,12 +214,38 @@ public static class ServiceExtensions
                     #endregion
                     return Task.CompletedTask;
                 },
+                OnTokenValidated = context =>
+                {
+                    // Token is valid, you can perform additional validation here if needed
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    var excepTYpe = context.Exception.GetType();
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers.Append("Token-Status", "expired");
+                    }else if(context.Exception.GetType() == typeof(SecurityTokenSignatureKeyNotFoundException))
+                    {
+                        context.Response.Headers.Append("Token-Status", "invalid token");
+                    }
+                    return Task.CompletedTask;
+                },
                 OnChallenge = context =>
                 {
+                    //if (context.AuthenticateFailure == null)
+                    //{
+                    //    return Task.CompletedTask;
+                    //}
                     context.HandleResponse();
                     context.Response.StatusCode = 401;
                     context.Response.ContentType = "application/json";
-                    var result = JsonSerializer.Serialize(new { message = "Unauthorized" });
+                    var result = JsonSerializer.Serialize(new
+                    {
+                        message = "Unauthorized",
+                        error = context.AuthenticateFailure?.Message,
+                        statCode = (int)StatusCodeEnum.Unauthorized
+                    });
                     return context.Response.WriteAsync(result);
                 }
             };
@@ -245,7 +264,7 @@ public static class ServiceExtensions
         {
             opt.AddPolicy("DefaultCorsPolicy", policy =>
             {
-                policy.WithOrigins("http://localhost:4500","http://localhost:3000", "https://localhost:4500")
+                policy.WithOrigins("http://localhost:4500", "http://localhost:3000", "https://localhost:4500")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();

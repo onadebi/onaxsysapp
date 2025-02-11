@@ -1,8 +1,5 @@
-﻿using AppGlobal.Models.Gemini;
-using AppGlobal.Models.YouTube;
+﻿using AppGlobal.Models.YouTube;
 using AppGlobal.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using OnaxTools.Dto.Http;
 using System.Net;
@@ -20,7 +17,6 @@ public class YouTubeController : ControllerBase
         _youTubeService = youTubeService;
     }
 
-    [AllowAnonymous]
     [HttpPost(nameof(Search))]
     [ProducesResponseType(typeof(GenResponse<object>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -1,14 +1,10 @@
-﻿using AppCore.Domain.AppCore.Dto;
-using AppGlobal.Services;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
+﻿using AppGlobal.Services;
 using Microsoft.AspNetCore.Mvc;
 using OnaxTools.Dto.Http;
 using System.Net;
 
 namespace WebApp.Controllers.Api;
 
-    [AllowAnonymous]
 [Route("api/[controller]")]
 [ApiController]
 public class MediaController : ControllerBase

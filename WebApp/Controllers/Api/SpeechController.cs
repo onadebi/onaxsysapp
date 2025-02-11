@@ -29,7 +29,6 @@ namespace WebApp.Controllers.Api
             return Ok(await Task.Run(() => _speechSvc.GetAllVoices()));
         }
 
-        [AllowAnonymous]
         [HttpPost(nameof(ConvertToSpeech))]
         [ProducesResponseType(typeof(GenResponse<string>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> ConvertToSpeech(TextToSpeechDto model)
