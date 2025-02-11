@@ -29,10 +29,26 @@ public static class ServiceExtensions
         string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=localhost;Port=5432;Database=onaxsys;Timeout=120;User Id=postgres;Password=onadebi;";
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
+        string BlobStorageConstring = Environment.GetEnvironmentVariable("BlobStorageConstring", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string BlobReadAccessYear2099 = Environment.GetEnvironmentVariable("BlobReadAccessYear2099", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string BlobStoragePath = Environment.GetEnvironmentVariable("BlobStoragePath", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string YoutubeApiKeyEnv = Environment.GetEnvironmentVariable("YoutubeApiKeyEnv", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string GeminiApiKey = Environment.GetEnvironmentVariable("GeminiApiKeyEnv", EnvironmentVariableTarget.Process) ?? string.Empty;
+
         services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(AppSettings)));
         services.Configure<ScriptsConfig>(builder.Configuration.GetSection(nameof(ScriptsConfig)));
         services.Configure<SessionConfig>(builder.Configuration.GetSection(nameof(SessionConfig)));
         services.Configure<EmailConfig>(builder.Configuration.GetSection(nameof(EmailConfig)));
+
+        // Globally postmodify the property values of certain fields in AppSettings to read from environment variables
+        builder.Services.PostConfigure<AppSettings>(options =>
+        {
+            options.AzureBlobConfig.BlobStorageConstring = BlobStorageConstring;
+            options.AzureBlobConfig.BlobReadAccessYear2099 = BlobReadAccessYear2099;
+            options.AzureBlobConfig.BlobStoragePath = BlobStoragePath;
+            options.ExternalAPIs.GeminiApi.GeminiApiApiKey = GeminiApiKey;
+            options.ExternalAPIs.YoutubeApi.YoutubeApiKey = YoutubeApiKeyEnv;
+        });
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
         services.AddSingleton<ISqlDataAccess>((svcProvider) => Factories<SqlDataAccess>.SqlDataAccessService(serviceProvider: svcProvider, conString: dbConstring));
@@ -186,6 +202,7 @@ public static class ServiceExtensions
         services.AddScoped<IPostCategoryService, PostCategoryService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
+        services.AddScoped<IFileManagerHelperService, FileManagerHelperService>();
 
         services.AddScoped<IMessageService, MessageService>();
 

@@ -489,3 +489,5 @@ $RECYCLE.BIN/
 # Vim temporary swap files
 *.swp
 /AppCore/Migrations/AppDbContextModelSnapshot.cs
+WebApp/Properties/launchSettings.json
+WebApp/Properties/launchSettings.json
