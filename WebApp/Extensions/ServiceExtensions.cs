@@ -17,6 +17,7 @@ using AppGlobal.Config.Communication;
 using System.Text.Json;
 using AppCore.Config;
 using AutoMapper;
+using Microsoft.OpenApi.Models;
 
 namespace WebApp.Extensions;
 
@@ -123,11 +124,46 @@ public static class ServiceExtensions
             c.BaseAddress = new Uri(youTubeUrl);
         });
 
+        #region Swagger authentication
+        services.AddSwaggerGen(c =>
+        {
+            c.EnableAnnotations();
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "OnaxApp APIs",
+                Version = "1.0.0",
+                Contact = new OpenApiContact { Email = "", Name = "OnaxApp" }
+            });
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Scheme = "Bearer ",
+                Description = "The access key required to access resources on this service. Example: {Bearer, SGE35HWE5EW5363256HERH }"
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id= "Bearer",
+                            Type= ReferenceType.SecurityScheme
+                        }
+                    }, new List<string>()
+                }
+            });
+        });
+        #endregion
+
         services.AddAuthentication(opt =>
         {
             #region for Cookie based MVC controller routes authentication
             opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             opt.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             //opt.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             #endregion
 
