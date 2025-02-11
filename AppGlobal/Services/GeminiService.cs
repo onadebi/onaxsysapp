@@ -59,7 +59,10 @@ public class GeminiService : IGeminiService
         }
         catch (Exception ex)
         {
-            throw new Exception(callerName, ex);
+            objResp.IsSuccess = false;
+            objResp.Error = objResp.Message = ex.Message;
+            objResp.StatCode = (int)StatusCodeEnum.ServerError;
+            objResp.Result = null;
         }
         return objResp;
     }

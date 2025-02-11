@@ -16,6 +16,7 @@ using AppGlobal.Services.PubSub;
 using AppGlobal.Config.Communication;
 using System.Text.Json;
 using AppCore.Config;
+using AutoMapper;
 
 namespace WebApp.Extensions;
 
@@ -104,7 +105,17 @@ public static class ServiceExtensions
 
 
         services.AddHttpContextAccessor();
-        services.AddHttpClient();
+        builder.Services.AddHttpClient(nameof(AppSettings.ExternalAPIs.GeminiApi), (svcProvider, c) =>
+        {
+            string geminiUrl = svcProvider.GetRequiredService<IOptions<AppSettings>>().Value.ExternalAPIs.GeminiApi.Url + GeminiApiKey;
+            c.BaseAddress = new Uri(geminiUrl);
+        });
+
+        builder.Services.AddHttpClient(nameof(AppSettings.ExternalAPIs.YoutubeApi), (svcProvider, c) =>
+        {
+            string youTubeUrl = svcProvider.GetRequiredService<IOptions<AppSettings>>().Value.ExternalAPIs.YoutubeApi.Url;
+            c.BaseAddress = new Uri(youTubeUrl);
+        });
 
         services.AddAuthentication(opt =>
         {
@@ -203,6 +214,12 @@ public static class ServiceExtensions
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
         services.AddScoped<IFileManagerHelperService, FileManagerHelperService>();
+
+        builder.Services.AddScoped<IGeminiService>((svcProv) =>
+        {
+            return new GeminiService(svcProv.GetRequiredService<IHttpClientFactory>()
+                , svcProv.GetRequiredService<IOptions<AppSettings>>(), svcProv.GetRequiredService<IMapper>());
+        });
 
         services.AddScoped<IMessageService, MessageService>();
 

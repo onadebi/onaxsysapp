@@ -30,6 +30,5 @@ public class MediaController : ControllerBase
     }
 
     #region HELPERS
-    public record FileUploader(IFormFile FileUpload);
     #endregion
 }
