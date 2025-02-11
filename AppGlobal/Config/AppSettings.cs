@@ -12,7 +12,7 @@ public class AppSettings
     public AzureBlobConfig AzureBlobConfig { get; set; } = default!;
     public required ExternalAPIs ExternalAPIs { get; set; }
     public required SessionConfig SessionConfig { get; set; }
-    public SpeechSynthesis SpeechSynthesis { get; set; }
+    public SpeechSynthesis SpeechSynthesis { get; set; } = default!;
     public required Prompts Prompts { get; set; }
 }
 
