@@ -1,6 +1,5 @@
 ﻿using AppGlobal.Models.Gemini;
 using AppGlobal.Services;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnaxTools.Dto.Http;
 using System.Net;
@@ -18,7 +17,6 @@ public class AIController : ControllerBase
         _geminiService = geminiService;
     }
 
-    [AllowAnonymous]
     [HttpPost(nameof(gemini))]
     [ProducesResponseType(typeof(GenResponse<object>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]

@@ -17,6 +17,8 @@ using AppGlobal.Config.Communication;
 using System.Text.Json;
 using AppCore.Config;
 using AutoMapper;
+using Microsoft.OpenApi.Models;
+using OnaxTools.Enums.Http;
 
 namespace WebApp.Extensions;
 
@@ -49,6 +51,12 @@ public static class ServiceExtensions
             options.AzureBlobConfig.BlobStoragePath = BlobStoragePath;
             options.ExternalAPIs.GeminiApi.GeminiApiApiKey = GeminiApiKey;
             options.ExternalAPIs.YoutubeApi.YoutubeApiKey = YoutubeApiKeyEnv;
+
+            #region SpeechSynthesis
+            options.SpeechSynthesis.SpeechKey = Environment.GetEnvironmentVariable("SpeechKey", EnvironmentVariableTarget.Process) ?? string.Empty;
+            options.SpeechSynthesis.SpeechEndpoint = Environment.GetEnvironmentVariable("SpeechEndpoint", EnvironmentVariableTarget.Process) ?? string.Empty;
+            options.SpeechSynthesis.SpeechLocation = Environment.GetEnvironmentVariable("SpeechLocation", EnvironmentVariableTarget.Process) ?? string.Empty;
+            #endregion
         });
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
@@ -117,17 +125,51 @@ public static class ServiceExtensions
             c.BaseAddress = new Uri(youTubeUrl);
         });
 
+        #region Swagger authentication
+        services.AddSwaggerGen(c =>
+        {
+            c.EnableAnnotations();
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "OnaxApp APIs",
+                Version = "1.0.0",
+                Contact = new OpenApiContact { Email = "", Name = "OnaxApp" }
+            });
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Type = SecuritySchemeType.ApiKey,
+                In = ParameterLocation.Header,
+                Scheme = "Bearer ",
+                Description = "The access key required to access resources on this service. Example: {Bearer, SGE35HWE5EW5363256HERH }"
+            });
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Id= "Bearer",
+                            Type= ReferenceType.SecurityScheme
+                        }
+                    }, new List<string>()
+                }
+            });
+        });
+        #endregion
+
         services.AddAuthentication(opt =>
         {
             #region for Cookie based MVC controller routes authentication
-            opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             opt.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            //opt.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             //opt.DefaultChallengeScheme = CookieAuthenticationDefaults.AuthenticationScheme;
             #endregion
 
 
             #region FOR jwt
-            //opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             opt.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             #endregion
         })
@@ -138,17 +180,10 @@ public static class ServiceExtensions
             x.LoginPath = "/home/Login";
             x.AccessDeniedPath = "/home/Login";
         })
-        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme,options =>
+        .AddJwtBearer(JwtBearerDefaults.AuthenticationScheme, options =>
         {
             byte[] key = Array.Empty<byte>();
-            if (builder.Environment.IsDevelopment())
-            {
-                key = Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("AppSettings:Encryption:Key") ?? "");
-            }
-            else
-            {
-                key = Encoding.UTF8.GetBytes(encryptionKey);
-            }
+            key = Encoding.UTF8.GetBytes(encryptionKey);
             options.RequireHttpsMetadata = false;
             options.SaveToken = false;
             options.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
@@ -179,12 +214,38 @@ public static class ServiceExtensions
                     #endregion
                     return Task.CompletedTask;
                 },
+                OnTokenValidated = context =>
+                {
+                    // Token is valid, you can perform additional validation here if needed
+                    return Task.CompletedTask;
+                },
+                OnAuthenticationFailed = context =>
+                {
+                    var excepTYpe = context.Exception.GetType();
+                    if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
+                    {
+                        context.Response.Headers.Append("Token-Status", "expired");
+                    }else if(context.Exception.GetType() == typeof(SecurityTokenSignatureKeyNotFoundException))
+                    {
+                        context.Response.Headers.Append("Token-Status", "invalid token");
+                    }
+                    return Task.CompletedTask;
+                },
                 OnChallenge = context =>
                 {
+                    //if (context.AuthenticateFailure == null)
+                    //{
+                    //    return Task.CompletedTask;
+                    //}
                     context.HandleResponse();
                     context.Response.StatusCode = 401;
                     context.Response.ContentType = "application/json";
-                    var result = JsonSerializer.Serialize(new { message = "Unauthorized" });
+                    var result = JsonSerializer.Serialize(new
+                    {
+                        message = "Unauthorized",
+                        error = context.AuthenticateFailure?.Message,
+                        statCode = (int)StatusCodeEnum.Unauthorized
+                    });
                     return context.Response.WriteAsync(result);
                 }
             };
@@ -203,7 +264,7 @@ public static class ServiceExtensions
         {
             opt.AddPolicy("DefaultCorsPolicy", policy =>
             {
-                policy.WithOrigins("http://localhost:4500","http://localhost:3000", "https://localhost:4500")
+                policy.WithOrigins("http://localhost:4500", "http://localhost:3000", "https://localhost:4500")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
@@ -213,6 +274,8 @@ public static class ServiceExtensions
         services.AddScoped<IPostCategoryService, PostCategoryService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
+        services.AddScoped<ISpeechService, SpeechService>();
+        services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         services.AddScoped<IFileManagerHelperService, FileManagerHelperService>();
 
         builder.Services.AddScoped<IGeminiService>((svcProv) =>
@@ -220,6 +283,12 @@ public static class ServiceExtensions
             return new GeminiService(svcProv.GetRequiredService<IHttpClientFactory>()
                 , svcProv.GetRequiredService<IOptions<AppSettings>>(), svcProv.GetRequiredService<IMapper>());
         });
+        builder.Services.AddScoped<IYouTubeService>((svcProv) =>
+        {
+            return new YouTubeService(svcProv.GetRequiredService<IHttpClientFactory>()
+                , svcProv.GetRequiredService<IOptions<AppSettings>>(), svcProv.GetRequiredService<IMapper>());
+        });
+
 
         services.AddScoped<IMessageService, MessageService>();
 
@@ -228,7 +297,6 @@ public static class ServiceExtensions
             , Factories<MessageBrokerService>.AppLoggerFactory(svcP.GetRequiredService<IConfiguration>()))
         );
         //services.AddScoped<IUserServiceRepository, UserServiceRepository>();
-        //services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         //services.AddScoped<IUserGroupRepository, UserGroupRepository>();
 
         //services.AddScoped<IMenuRepository, MenuRepository>();

@@ -49,6 +49,10 @@ public class YouTubeService: IYouTubeService
             {
                 var resp = await response.Content.ReadAsStringAsync(ct);
                 objResp.Result = !string.IsNullOrWhiteSpace(resp) ? JsonSerializer.Deserialize<YouTubeApiResponse>(resp) : null;
+                objResp.Result?.items.ForEach((i) =>
+                {
+                    i.id.videoUrlComplete = $"https://www.youtube.com/watch?v={i.id.videoId}";
+                });
                 objResp.StatCode = (int)StatusCodeEnum.OK;
                 objResp.IsSuccess = true;
             }
