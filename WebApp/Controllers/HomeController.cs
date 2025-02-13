@@ -1,7 +1,10 @@
+using AppCore.Services.Helpers;
 using AppGlobal.Services.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OnaxTools.Dto.Http;
 using OnaxTools.Services.StackExchangeRedis.Interface;
+using Polly;
 
 namespace WebApp.Controllers
 {
@@ -11,12 +14,15 @@ namespace WebApp.Controllers
         private readonly ILogger<HomeController> _logger;
         private readonly ICacheService cacheService;
         private readonly IAppLogger<HomeController> _applogger;
+        private readonly IPollyService<GenResponse<string>, Exception> _pollyService;
 
-        public HomeController(ILogger<HomeController> logger, ICacheService cacheService,IAppLogger<HomeController> applogger)
+        public HomeController(ILogger<HomeController> logger, ICacheService cacheService
+            , IAppLogger<HomeController> applogger, IPollyService<GenResponse<string>, Exception> pollyService)
         {
             _logger = logger;
             this.cacheService = cacheService;
             _applogger = applogger;
+            _pollyService = pollyService;
         }
         public async Task<IActionResult> Index()
         {
@@ -25,15 +31,21 @@ namespace WebApp.Controllers
             return View(nameof(Index));
         }
 
-        public IActionResult Privacy()
+        public async Task<IActionResult> Privacy()
         {
+            GenResponse<string> resp = new();
+            await _pollyService.ResiliencePipeline(fallbackAction: _ => Outcome.FromResultAsValueTask(GenResponse<string>.Failed("Failed to save to DB")))
+                .ExecuteAsync(async (cancellationToken) =>
+            {
+                resp = await _applogger.LogInformationAsync("Resilience with Polly and DI implementation.");
+                return resp;
+            });
             return View(nameof(Privacy));
         }
 
         [AllowAnonymous]
-        public async Task<IActionResult> Login()
+        public IActionResult Login()
         {
-            var resp = await _applogger.LogInformationAsync("User visited login page");
             return View(nameof(Login));
         }
     }

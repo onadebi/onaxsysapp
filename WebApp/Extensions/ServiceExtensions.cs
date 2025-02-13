@@ -20,6 +20,7 @@ using AutoMapper;
 using Microsoft.OpenApi.Models;
 using OnaxTools.Enums.Http;
 using AppGlobal.Services.Logger;
+using AppCore.Services.Helpers;
 
 namespace WebApp.Extensions;
 
@@ -295,6 +296,7 @@ public static class ServiceExtensions
         #endregion
 
         services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
+        services.AddScoped(typeof(IPollyService<,>), typeof(PollyService<,>));
         services.AddScoped<IPostCategoryService, PostCategoryService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
