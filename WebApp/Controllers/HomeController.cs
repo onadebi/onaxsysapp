@@ -1,3 +1,4 @@
+using AppGlobal.Services.Logger;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using OnaxTools.Services.StackExchangeRedis.Interface;
@@ -9,11 +10,13 @@ namespace WebApp.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly ICacheService cacheService;
+        private readonly IAppLogger<HomeController> _applogger;
 
-        public HomeController(ILogger<HomeController> logger, ICacheService cacheService)
+        public HomeController(ILogger<HomeController> logger, ICacheService cacheService,IAppLogger<HomeController> applogger)
         {
             _logger = logger;
             this.cacheService = cacheService;
+            _applogger = applogger;
         }
         public async Task<IActionResult> Index()
         {
@@ -28,8 +31,9 @@ namespace WebApp.Controllers
         }
 
         [AllowAnonymous]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
+            var resp = await _applogger.LogInformationAsync("User visited login page");
             return View(nameof(Login));
         }
     }

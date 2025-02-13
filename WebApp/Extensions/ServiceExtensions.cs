@@ -19,6 +19,7 @@ using AppCore.Config;
 using AutoMapper;
 using Microsoft.OpenApi.Models;
 using OnaxTools.Enums.Http;
+using AppGlobal.Services.Logger;
 
 namespace WebApp.Extensions;
 
@@ -225,7 +226,8 @@ public static class ServiceExtensions
                     if (context.Exception.GetType() == typeof(SecurityTokenExpiredException))
                     {
                         context.Response.Headers.Append("Token-Status", "expired");
-                    }else if(context.Exception.GetType() == typeof(SecurityTokenSignatureKeyNotFoundException))
+                    }
+                    else if (context.Exception.GetType() == typeof(SecurityTokenSignatureKeyNotFoundException))
                     {
                         context.Response.Headers.Append("Token-Status", "invalid token");
                     }
@@ -270,7 +272,29 @@ public static class ServiceExtensions
                         .AllowCredentials();
             });
         });
+        #region OLD WAY OF ADDING LOGGER with Activator.CreateInstance
+        //builder.Services.AddScoped(typeof(IAppLogger<>), (serviceProvider) =>
+        //{
+        //    var mongoDataAccess = serviceProvider.GetRequiredService<IMongoDataAccess>();
+        //    var appSessionContext = serviceProvider.GetRequiredService<IAppSessionContextRepository>();
+        //    var appSettings = serviceProvider.GetRequiredService<IOptions<AppSettings>>();
 
+        //    // Get the service type being requested
+        //    Type serviceType = serviceProvider.GetType().GetGenericArguments()[0];
+
+        //    // Create the concrete logger type
+        //    var loggerType = typeof(AppLogger<>).MakeGenericType(serviceType);
+
+        //    var instance = Activator.CreateInstance(
+        //        loggerType,
+        //        mongoDataAccess,
+        //        appSettings.Value.AppName,
+        //        appSessionContext);
+        //    return instance ?? throw new InvalidOperationException($"Failed to create instance of {loggerType.Name}");
+        //});
+        #endregion
+
+        services.AddScoped(typeof(IAppLogger<>), typeof(AppLogger<>));
         services.AddScoped<IPostCategoryService, PostCategoryService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
@@ -288,6 +312,8 @@ public static class ServiceExtensions
             return new YouTubeService(svcProv.GetRequiredService<IHttpClientFactory>()
                 , svcProv.GetRequiredService<IOptions<AppSettings>>(), svcProv.GetRequiredService<IMapper>());
         });
+
+
 
 
         services.AddScoped<IMessageService, MessageService>();
