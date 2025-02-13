@@ -13,10 +13,12 @@ namespace AppGlobal.Services;
 public class AppSessionContextRepository : IAppSessionContextRepository
 {
     private readonly IHttpContextAccessor _contextAccessor;
+    private readonly TokenService _tokenService;
     private readonly AppSettings _sessionConfig;
-    public AppSessionContextRepository(IHttpContextAccessor contextAccessor, IOptions<AppSettings> sessionConfig)
+    public AppSessionContextRepository(IHttpContextAccessor contextAccessor, IOptions<AppSettings> sessionConfig, TokenService tokenService)
     {
         _contextAccessor = contextAccessor;
+        _tokenService = tokenService;
         this._sessionConfig = sessionConfig.Value;
     }
 
@@ -28,24 +30,36 @@ public class AppSessionContextRepository : IAppSessionContextRepository
             string? cookieValue = null;
             if (_contextAccessor != null && _contextAccessor.HttpContext != null)
             {
-                _contextAccessor.HttpContext.Request.Cookies.TryGetValue(AppConstants.CookieUserId, out cookieValue);
+
+                _contextAccessor.HttpContext.Request.Cookies.TryGetValue(_sessionConfig.SessionConfig.Auth.token, out cookieValue);
+                #region First get by claims
+                GenResponse<AppUserIdentity> userClaimsData = _tokenService.ValidateToken(_contextAccessor.HttpContext);
+                if (userClaimsData.IsSuccess && userClaimsData.Result != null)
+                {
+                    objResp.Data = userClaimsData.Result;
+                    objResp.Email = userClaimsData.Result.Email;
+                    return objResp;
+                }
+                #endregion
             }
             if (String.IsNullOrWhiteSpace(cookieValue))
             {
                 return objResp;
             }
-            else
-            {
-                byte[]? userDataFromSession = null;
-                if (_contextAccessor != null && _contextAccessor.HttpContext != null)
-                {
-                    _contextAccessor.HttpContext.Session.TryGetValue(key: cookieValue, out userDataFromSession);
-                }
-                if (userDataFromSession != null && userDataFromSession.Any())
-                {
-                    objResp = System.Text.Json.JsonSerializer.Deserialize<AppSessionData<AppUserIdentity>>(Encoding.UTF8.GetString(userDataFromSession)) ?? new AppSessionData<AppUserIdentity>();
-                }
-            }
+            #region Commented out due to session not been configured. Uncomment if session is configured
+            //else
+            //{
+            //    byte[]? userDataFromSession = null;
+            //    if (_contextAccessor != null && _contextAccessor.HttpContext != null)
+            //    {
+            //        _contextAccessor.HttpContext.Session.TryGetValue(key: cookieValue, out userDataFromSession);
+            //    }
+            //    if (userDataFromSession != null && userDataFromSession.Any())
+            //    {
+            //        objResp = System.Text.Json.JsonSerializer.Deserialize<AppSessionData<AppUserIdentity>>(Encoding.UTF8.GetString(userDataFromSession)) ?? new AppSessionData<AppUserIdentity>();
+            //    }
+            //}
+            #endregion
         }
         catch (Exception ex)
         {

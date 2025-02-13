@@ -3,6 +3,7 @@ using Microsoft.Extensions.Primitives;
 using OnaxTools.Dto.Http;
 using OnaxTools.Dto.Identity;
 using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using System.Text.Json;
 
 namespace AppGlobal.Helpers;
@@ -71,10 +72,12 @@ public static class CommonHelpers
                     var appUser = new AppUserIdentity
                     {
                         Email = tokenValues["Email"],
-                        DisplayName = tokenValues["unique_name"],
-                        Id = Convert.ToInt32(tokenValues["UserId"])
+                        DisplayName = tokenValues["display_name"],
+                        Guid = tokenValues["guid"],
+                        Id = Convert.ToInt32(tokenValues[ClaimTypes.Sid]),
+                        ExpiresAt = jwtoken.ValidTo
                     };
-                    string userRoles = tokenValues["Role"];
+                    string userRoles = tokenValues["role"];
                     appUser.Roles = !string.IsNullOrWhiteSpace(userRoles) ? [.. userRoles.Split(',')] : new();
                     objResp = GenResponse<AppUserIdentity>.Success(appUser);
                 }

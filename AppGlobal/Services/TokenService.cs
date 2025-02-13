@@ -29,7 +29,7 @@ public class TokenService
                 new Claim("display_name", user.DisplayName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.NameIdentifier, user.Email),
-                new Claim("nameid", user.Guid),
+                new Claim("guid", user.Guid),
                 new Claim(ClaimTypes.Sid, $"{user.Id}"),
                 new Claim(ClaimTypes.Role, System.Text.Json.JsonSerializer.Serialize(user.Roles), JsonClaimValueTypes.JsonArray)
             };
@@ -116,8 +116,10 @@ public class TokenService
                         var AppUserIdentity = new AppUserIdentity
                         {
                             Email = tokenValues["email"],
-                            DisplayName = tokenValues["unique_name"],
-                            Guid = tokenValues["nameid"],
+                            DisplayName = tokenValues["display_name"],
+                            Guid = tokenValues["guid"],
+                            Id = Convert.ToInt32(tokenValues[ClaimTypes.Sid]),
+                            ExpiresAt = jwtoken.ValidTo
                         };
                         string userRoles = tokenValues["role"];
                         AppUserIdentity.Roles = !string.IsNullOrWhiteSpace(userRoles) ? userRoles.Split(',').ToList<string>() : new List<string>();
