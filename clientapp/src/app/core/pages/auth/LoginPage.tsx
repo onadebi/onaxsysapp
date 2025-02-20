@@ -8,6 +8,7 @@ import GenResponse from "../../../common/config/GenResponse";
 import { useAppStore } from "../../../common/services/appservices";
 import BlogAppRoutes from "../../BlogAppRoutes";
 import appsettings from "../../../common/config/appsettings";
+import avatar from '../../../../assets/images/avatar.png';
 
 
 const LoginPage: React.FC = () => {
@@ -29,6 +30,9 @@ const LoginPage: React.FC = () => {
   }, [authService, commonService, navigate]);
 
   const LoginSuccess =(credResp: GenResponse<UserLoginResponse>)=>{
+    if(credResp.result && (credResp.result.picture === undefined || credResp.result.picture === null || credResp.result.picture.trim() === '')) {
+      credResp.result.picture = avatar;
+    }
     const credObjResp= JSON.stringify(credResp);
     console.log(credObjResp);
     commonService.setLocaStoragae(appsettings.token.authToken, credObjResp);
