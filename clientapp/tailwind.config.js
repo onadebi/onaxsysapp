@@ -10,6 +10,7 @@ export default {
         onaxSky: '#C3EBFA',
   			onaxSkyLight: '#EDF9FD',
 			  onaxBlue: '#2563eb',
+        onaxMenuBlue: '#045eff',
   			onaxPurple: '#CFCEFF',
   			onaxPurpleLight: '#F1F0FF',
       }

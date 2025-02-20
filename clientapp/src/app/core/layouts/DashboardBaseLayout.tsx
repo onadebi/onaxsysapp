@@ -53,13 +53,6 @@ const DashboardBaseLayout: React.FC = () => {
                 </RouteTo>
                 <Menu />
              </aside>
-            {/* <aside className='hidden md:flex flex-col gap-4 w-1/8 2xl:mr-2 lx:mr-2 lg:mr-2 md:mr-2'>
-            {
-              operations.map((op, index) => (
-                <DashboardCards key={index} title={op.title} url={op.url} />
-              ))
-            }
-            </aside> */}
             <div className='w-full p-1 bg-slate-50'>
               <Outlet />
             </div>

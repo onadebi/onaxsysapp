@@ -13,13 +13,6 @@ const Home: React.FC = () => {
       <MetaTag title={"Home"} />
       <div>
         <div className="flex gap-4">
-          {/*<RouteTo to={BlogAppRoutes().dashboard.home.parentRoute}>
-            Dashboard
-          </RouteTo>
-          <RouteTo to={BlogAppRoutes().public.home.parentRoute}>
-            Home
-          </RouteTo>
-           <span>•</span><span className="text-blue-800">Blogs and Articles</span> */}
         </div>
         <div className="flex items-center justify-between">
           <div className="">
