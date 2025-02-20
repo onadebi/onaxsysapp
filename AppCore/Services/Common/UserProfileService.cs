@@ -23,15 +23,18 @@ public class UserProfileService : IUserProfileService
     private readonly AppDbContext _context;
     private readonly ISocialAuthService _socialAuthService;
     private readonly IMapper _mapper;
+    private readonly IMessageService _messageService;
     private readonly AppSettings _appSettings;
 
-    public UserProfileService(ILogger<UserProfileService> logger, AppDbContext context, IOptions<AppSettings> appSettings, ISocialAuthService socialAuthService, IMapper mapper)
+    public UserProfileService(ILogger<UserProfileService> logger, AppDbContext context, IOptions<AppSettings> appSettings
+        , ISocialAuthService socialAuthService, IMapper mapper, IMessageService messageService)
     {
         _logger = logger;
         _context = context;
         _appSettings = appSettings.Value;
         _socialAuthService = socialAuthService;
-        this._mapper = mapper;
+        _mapper = mapper;
+        _messageService = messageService;
     }
 
     public async Task<GenResponse<UserLoginResponse>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default)
@@ -125,7 +128,7 @@ public class UserProfileService : IUserProfileService
                     ExpiredAt = DateTime.Now.AddMinutes(10)
 
                 };
-                //GenResponse<string> mailSendResult = await _msgRepo.InsertNewMessageAndSendMail(emailBody, msg);
+                var wasSuccessful = await _messageService.InsertNewMessageAndSendMail(emailBody, msg);
                 #endregion
             }
             else
@@ -136,7 +139,10 @@ public class UserProfileService : IUserProfileService
         catch (Exception ex)
         {
             _logger.LogError(ex, $"ERROR in [{caller}]: Occured while registering user: " + user.Email);
-            return GenResponse<UserLoginResponse>.Failed("An internal error occured. Kindly try again.");
+            if (!objResp.IsSuccess)
+            {
+                return GenResponse<UserLoginResponse>.Failed("An internal error occured. Kindly try again.");
+            }
         }
         return objResp;
     }
@@ -164,7 +170,9 @@ public class UserProfileService : IUserProfileService
                     LastName = userDetail.LastName,
                     Roles = userRoles == null ? ["user"]: [.. userRoles],
                     Guid = userDetail.Guid,
-                    Id = userDetail.Id
+                    Id = userDetail.Id,
+                    Picture = userDetail.UserProfileImage,
+                    SocialLogin = new() { IsSocialLogin = true }
                 };
                 return GenResponse<UserLoginResponse>.Success(result);
             }
@@ -204,7 +212,8 @@ public class UserProfileService : IUserProfileService
                         Roles = userProfileParams.UserProfileUserApps.Count > 0 ? [.. userApp.UserRole] : ["user"],
                         Guid = userProfileParams.Guid,
                         Id = userProfileParams.Id,
-                        Picture = userProfileParams.UserProfileImage
+                        Picture = userProfileParams.UserProfileImage,
+                        SocialLogin = new() { IsSocialLogin = true }
                     };
                     objResp.StatCode = (int)StatusCodeEnum.OK;
                 }

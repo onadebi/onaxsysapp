@@ -18,7 +18,7 @@ export interface SocialLogin {
     token: string
 }
 
-export type UserLoginResponseUpdateDTO =  Omit<UserLoginResponse,'socialLogin'|'token'|'roles'> & {
+export type UserLoginResponseUpdateDTO =  Omit<UserLoginResponse,|'token'|'roles'> & {
     sex: 'male' | 'female'| 'unspecified';
 }
   

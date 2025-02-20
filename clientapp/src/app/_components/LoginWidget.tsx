@@ -86,7 +86,7 @@ const LoginWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signUpRoute,allo
                 if(onSuccess){onSuccess(GenResponse.Result(objRespData.result));}
             }else{
                 // alert(objRespData.error ?? objRespData.message);
-                if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
+                if(onError){onError(GenResponse.Failed<T>(null as unknown as T,objRespData.error ?? 'Login failed. Incorrect username/password.'));}
             }
         }else{
             alert("Login failed");
