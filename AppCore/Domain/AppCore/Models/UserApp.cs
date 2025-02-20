@@ -22,5 +22,7 @@ namespace AppCore.Domain.AppCore.Models
         public DateTime DateCreated { get; set; } = DateTime.UtcNow;
 
         public UserProfile UserProfile { get; set; } = default!;
+
+        public int CreditBalance { get; set; }
     }
 }
