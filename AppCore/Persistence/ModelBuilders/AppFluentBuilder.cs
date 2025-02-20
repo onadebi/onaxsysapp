@@ -1,5 +1,5 @@
 using AppCore.Domain.AppCore.Models;
-using AppCore.Domain.AppCore.TransactionModels;
+using AppCore.Domain.AppCore.Models.TransactionModels;
 using AppCore.Domain.Blog.Entities;
 using Microsoft.EntityFrameworkCore;
 
