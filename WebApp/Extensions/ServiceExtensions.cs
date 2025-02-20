@@ -17,6 +17,8 @@ using AppGlobal.Config.Communication;
 using System.Text.Json;
 using AppCore.Config;
 using AutoMapper;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.OpenApi.Models;
 using OnaxTools.Enums.Http;
 using AppGlobal.Services.Logger;
@@ -81,8 +83,11 @@ public static class ServiceExtensions
             }))
             );
 
-        //services.AddHangfire(x => x.UsePostgreSqlStorage(dbConstring));
-        //services.AddHangfireServer();
+        services.AddHangfire(x => x.UsePostgreSqlStorage(options =>
+        {
+            options.UseNpgsqlConnection(dbConstring);
+        }));
+        services.AddHangfireServer();
 
         #region REMOVE CACHE FROM IMPACTING STARTUP
         services.AddScoped<ICacheService>((svcProvider) =>
