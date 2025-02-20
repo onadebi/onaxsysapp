@@ -15,7 +15,7 @@ public class MessageBox
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     [JsonProperty(PropertyName = nameof(Id))]
-    public string Id { get; set; } = Guid.NewGuid().ToString();
+    public string? Id { get; set; }
 
     [Required]
     [BsonElement(nameof(AppName))]

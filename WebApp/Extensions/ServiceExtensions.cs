@@ -17,10 +17,13 @@ using AppGlobal.Config.Communication;
 using System.Text.Json;
 using AppCore.Config;
 using AutoMapper;
+using Hangfire;
+using Hangfire.PostgreSql;
 using Microsoft.OpenApi.Models;
 using OnaxTools.Enums.Http;
 using AppGlobal.Services.Logger;
 using AppCore.Services.Helpers;
+using Microsoft.Extensions.Primitives;
 
 namespace WebApp.Extensions;
 
@@ -81,8 +84,11 @@ public static class ServiceExtensions
             }))
             );
 
-        //services.AddHangfire(x => x.UsePostgreSqlStorage(dbConstring));
-        //services.AddHangfireServer();
+        services.AddHangfire(x => x.UsePostgreSqlStorage(options =>
+        {
+            options.UseNpgsqlConnection(dbConstring);
+        }));
+        services.AddHangfireServer();
 
         #region REMOVE CACHE FROM IMPACTING STARTUP
         services.AddScoped<ICacheService>((svcProvider) =>
@@ -208,9 +214,10 @@ public static class ServiceExtensions
                     #region USe Bearer Token in the absence of Cookie auth
                     if (context.Token == null)
                     {
-                        if (context.Request.Headers.ContainsKey("Authorization"))
+                        if (context.Request.Headers.TryGetValue("Authorization", out StringValues HeaderAuth))
                         {
-                            context.Token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
+                            context.Token = HeaderAuth.ToString().Replace("Bearer ", "");
+                            //context.Token = context.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
                         }
                     }
                     #endregion

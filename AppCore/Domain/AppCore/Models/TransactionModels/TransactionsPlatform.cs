@@ -2,7 +2,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AppCore.Domain.AppCore.Transactions;
+namespace AppCore.Domain.AppCore.Models.TransactionModels;
 
 [Table(nameof(TransactionsPlatform))]
 public class TransactionsPlatform: CommonEntity

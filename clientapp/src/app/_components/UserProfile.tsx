@@ -1,7 +1,6 @@
 import { useRef, useState, useEffect } from 'react';
 import { useAppStore } from '../common/services/appservices';
 import RouteTo from './RouteTo';
-import avatar from '../../assets/images/avatar.png';
 import logout from '../../assets/images/logout.png';
 import setting from '../../assets/images/setting.png';
 import AppRoutes from '../../routes/AppRoutes';
@@ -48,11 +47,11 @@ const UserProfile = () => {
     }, [userProfileNavDisplay]);
 
     return (
-        authService.UserProfile().isSuccess
+        authService.UserProfile().isSuccess && authService.UserProfile().result
             ?
             <aside className='flex items-center gap-[1rem]'>
                 <span className='cursor-pointer relative' title={`${authService.UserProfile().result?.firstName}`}>
-                    <img src={authService.UserProfile().result?.picture ?? avatar} alt='avatar' ref={avatarRef} className='rounded-full w-8 h-8' onClick={() => setUserProfileNavDisplay(prev => !prev)} />
+                    <img src={authService.UserProfile().result?.picture} alt='avatar' ref={avatarRef} className='rounded-full w-8 h-8' onClick={() => setUserProfileNavDisplay(prev => !prev)} />
                     <div ref={dropdownRef} className={`border bg-[white] absolute top-19 ${dropdownPosition} rounded-md mt-2 min-w-[250px] overflow-hidden ${!userProfileNavDisplay && 'hidden'}`} style={{ whiteSpace: 'nowrap' }}>
                         <ul className='userprofile_menu'>
                             <li className='flex items-center gap-2'>

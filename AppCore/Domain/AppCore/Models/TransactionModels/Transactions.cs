@@ -1,9 +1,8 @@
-﻿using AppCore.Domain.AppCore.Models;
-using AppGlobal.Models;
+﻿using AppGlobal.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace AppCore.Domain.AppCore.Transactions;
+namespace AppCore.Domain.AppCore.Models.TransactionModels;
 
 [Table(nameof(Transactions))]
 public class Transactions: CommonEntity

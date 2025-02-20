@@ -1,4 +1,4 @@
-﻿using AppCore.Domain.Imagify;
+﻿using AppCore.Domain.AppCore.Models.TransactionModels;
 using OnaxTools.Dto.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
