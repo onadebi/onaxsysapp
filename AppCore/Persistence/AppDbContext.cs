@@ -31,4 +31,7 @@ public class AppDbContext: DbContext
 
     public DbSet<AppDocuments> AppDocumentz { get; set; }
     public DbSet<UserDocument> UserDocuments { get; set; }
+
+    public DbSet<Transactions> Transactions { get; set; }
+    public DbSet<TransactionsPlatform> TransactionsPlatforms { get; set; }
 }

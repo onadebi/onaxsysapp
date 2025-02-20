@@ -18,6 +18,8 @@ public static class AppFluentBuilder
             prop.HasIndex(m => m.Guid, "ix_UserProfile_Guid_Unique").IsUnique();
             prop.HasIndex(m => m.Email, "ix_UserProfile_Email_Unique").IsUnique();
             prop.HasIndex(m => m.Username, "ix_UserProfile_Usernname_Unique").IsUnique();
+            prop.HasMany<Transactions>(m => m.UserTransactions).WithOne((Transactions m) => m.UserProfileGuid)
+            .HasForeignKey(t => t.UserGuid).HasPrincipalKey((UserProfile p) => p.Guid).OnDelete(DeleteBehavior.Restrict);
         });
 
 
@@ -38,7 +40,18 @@ public static class AppFluentBuilder
                 .WithOne((UserApp p) => p.UserProfile)
                 .HasForeignKey(f => f.UserId)
                 .HasPrincipalKey(p => p.Guid)
-                .OnDelete(DeleteBehavior.Cascade);
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        model.Entity<Transactions>(prop =>
+        {
+            prop.HasIndex(m=> m.PlatformTransactionId, "ix_Transactions_PlatformTransactionId").IsUnique();
+            prop.HasIndex(m=> m.TransactionPlatformId, "ix_Transactions_TransactionPlatformId").IsUnique();
+        });
+        model.Entity<TransactionsPlatform>(prop =>
+        {
+            prop.HasIndex(m => m.PlatformTransactionId, "ix_TransactionsPlatform_PlatformTransactionId").IsUnique();
+            prop.HasMany<Transactions>(m => m.TransactionsList).WithOne(m=>m.TransactionsPlatform).HasForeignKey(f=> f.TransactionPlatformId).OnDelete(DeleteBehavior.Restrict);
         });
 
 

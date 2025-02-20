@@ -3,7 +3,7 @@ import CommonService from "./common-service";
 import { AuthService } from "./authservice";
 import NotificationsService from "./notificationsService";
 import ImagesService from "./images-service";
-import BlogAppService from "../../blogapp/services/blogappService";
+import BlogAppService from "../../core/services/blogappService";
 
 interface IAppServices {
     commonService: CommonService;

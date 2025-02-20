@@ -1,16 +1,16 @@
 import { createBrowserRouter } from "react-router-dom";
-import GeneralLayout from "../app/blogapp/layouts/GeneralLayout";
-import Home from "../app/blogapp/pages/Home";
-import BlogAppRoutes from "../app/blogapp/BlogAppRoutes";
-// import DashboardLayout from "../app/blogapp/layouts/DashboardLayout";
-import Dashboard from "../app/blogapp/pages/dashboard/Dashboard";
-import RegisterPage from "../app/blogapp/pages/register/RegisterPage";
-import LoginPage from "../app/blogapp/pages/auth/LoginPage";
-import WritePage from "../app/blogapp/pages/posts/WritePage";
-// import SinglePostPage from "../app/blogapp/pages/posts/SinglePostPage";
-// import PostListPage from "../app/blogapp/pages/posts/PostListPage";
-import UploadTest from "../app/blogapp/pages/register/UploadTest";
-import DashboardBaseLayout from "../app/blogapp/layouts/DashboardBaseLayout";
+import GeneralLayout from "../app/core/layouts/GeneralLayout";
+import Home from "../app/core/pages/Home";
+import BlogAppRoutes from "../app/core/BlogAppRoutes";
+// import DashboardLayout from "../app/core/layouts/DashboardLayout";
+import Dashboard from "../app/core/pages/dashboard/Dashboard";
+import RegisterPage from "../app/core/pages/register/RegisterPage";
+import LoginPage from "../app/core/pages/auth/LoginPage";
+import WritePage from "../app/core/pages/posts/WritePage";
+// import SinglePostPage from "../app/core/pages/posts/SinglePostPage";
+// import PostListPage from "../app/core/pages/posts/PostListPage";
+import UploadTest from "../app/core/pages/register/UploadTest";
+import DashboardBaseLayout from "../app/core/layouts/DashboardBaseLayout";
 
 const AppRouter = createBrowserRouter([
     {

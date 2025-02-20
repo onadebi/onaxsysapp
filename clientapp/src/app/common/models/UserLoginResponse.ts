@@ -6,6 +6,7 @@ export type UserLoginResponse = {
     guid: string;
     id: string;
     roles: string[];
+    picture?: string;
     token?: string;
     socialLogin?: SocialLogin;
 }

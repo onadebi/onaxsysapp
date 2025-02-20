@@ -1,4 +1,5 @@
-﻿using OnaxTools.Dto.Identity;
+﻿using AppCore.Domain.Imagify;
+using OnaxTools.Dto.Identity;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -62,6 +63,7 @@ namespace AppCore.Domain.AppCore.Models
 
         #region Navigational properties
         public virtual ICollection<UserApp> UserProfileUserApps { get; set; } = [];
+        public virtual ICollection<Transactions> UserTransactions { get; set; } = [];
 
         #endregion
 

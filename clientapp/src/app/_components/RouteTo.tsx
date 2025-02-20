@@ -5,12 +5,13 @@ interface IProps{
     to: string;
     children: React.ReactNode;
     className?: string;
+    title?: string
 }
 
-const RouteTo:React.FC<IProps> = ({to, children,className}) => {
+const RouteTo:React.FC<IProps> = ({to, children,className,title}) => {
   return (
     <>
-        <NavLink to={to} className={`${className}`} onClick={() => window.scrollTo(0, 0)}>
+        <NavLink to={to} className={`${className}`} onClick={() => window.scrollTo(0, 0)} title={title}>
             {children}
         </NavLink>
     </>
