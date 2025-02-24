@@ -30,7 +30,7 @@ jobs:
       run: |
         npm install -g typescript
 
-  build_app:
+  test_and_build_app:
     runs-on: ubuntu-latest
     needs: frontend_env_dependencies
     steps:
