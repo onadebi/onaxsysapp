@@ -64,6 +64,7 @@ jobs:
       working-directory: ${{ env.WORKING_DIRECTORY}}/AppTest
       run: |
           echo "==========Running Tests============"
+          ls -l
           dotnet test --no-build
     #region Publish to Azure Web App      
     # - name: Publish
