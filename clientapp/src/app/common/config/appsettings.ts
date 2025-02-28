@@ -8,7 +8,7 @@ const appsettings = {
     // appUrl: 'https://coursetakeoff.live',
     env: 'development',
     baseUrls: {
-        baseUrl: 'http://localhost:5050', 
+        baseUrl: 'https://onaxapp.onrender.com', 
         // baseUrl: `${window.location.origin}/api`,
     },
     Auth:{

@@ -47,7 +47,7 @@ const LoginPage: React.FC = () => {
     <>
       <MetaTag title="Login" />
       <div className="flex items-center justify-center h-[calc(100vh-80px)]">
-        <LoginWidget<UserLoginResponse> apiUrl="http://localhost:5050/api/Auth/Login" googleApiUrl={`http://localhost:5050/api/Auth/GoogleLogin`} onSuccess={LoginSuccess} onError={LoginError} signUpRoute={'/register'} />
+        <LoginWidget<UserLoginResponse> apiUrl={`${appsettings.baseUrls.baseUrl}/api/Auth/Login`} googleApiUrl={`${appsettings.baseUrls.baseUrl}/api/Auth/GoogleLogin`} onSuccess={LoginSuccess} onError={LoginError} signUpRoute={'/register'} />
       </div>
     </>
   );
