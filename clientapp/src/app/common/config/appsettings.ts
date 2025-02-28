@@ -61,7 +61,7 @@ const appsettings = {
             return `https://www.youtube.com/watch?v=${videoId}`;
         },
         GoogleAuth:{
-            clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
+            clientId: import.meta.env.VITE_GOOGLE_CLIENT_ID || '876938636452-ck8pmi1niv5vsmtj7842ajaiu01nk04g.apps.googleusercontent.com',
         }
     },
     public:{
