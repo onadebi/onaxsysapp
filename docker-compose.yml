@@ -16,6 +16,8 @@ services:
       - DBConString_obs=${DBConString_obs}
       - DBConString=${DBConString}
       - RedisConstring=${RedisConstring}
+      - RabbitMqConString=${RabbitMqConString}
+      - MongoDbConnect=${MongoDbConnect}
       - GeminiApiKeyEnv=${GeminiApiKeyEnv}
       - YoutubeApiKeyEnv=${YoutubeApiKeyEnv}
       - BlobStorageConstring=${BlobStorageConstring}
