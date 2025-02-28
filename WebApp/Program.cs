@@ -1,3 +1,5 @@
+using AppCore.Persistence.ModelBuilders;
+using Hangfire.Logging;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.FileProviders;
@@ -18,6 +20,19 @@ builder.Services.AddCustomServiceCollections(builder);
 #endregion
 
 var app = builder.Build();
+
+try
+{
+    bool seedDatabase =  builder.Configuration.GetValue<bool>("AppSettings:DatabaseOptions:SeedDatabase");
+    if (seedDatabase)
+    {
+        app.SeedDefaultsData().Wait();
+    }
+}
+catch (Exception ex)
+{
+    OnaxTools.Logger.LogException(ex);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())

@@ -24,6 +24,7 @@ namespace WebApp.Controllers
             _applogger = applogger;
             _pollyService = pollyService;
         }
+
         public async Task<IActionResult> Index()
         {
             _ = await cacheService.SetData<List<string>>("categories", new List<string> { "Category 1", "Category 2", "Category 3" }, 60);

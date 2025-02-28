@@ -20,8 +20,4 @@
 		<ProjectReference Include="..\AppGlobal\AppGlobal.csproj" />
 	</ItemGroup>
 
-	<ItemGroup>
-		<Folder Include="Domain\AppCore\Config\" />
-	</ItemGroup>
-
 </Project>

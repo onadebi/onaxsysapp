@@ -22,6 +22,10 @@ public static class AppFluentBuilder
             .HasForeignKey(t => t.UserGuid).HasPrincipalKey((UserProfile p) => p.Guid).OnDelete(DeleteBehavior.Restrict);
         });
 
+        model.Entity<ResourceAccess>(prop =>
+        {
+            prop.HasIndex(m=> m.ResourceFullName, "ix_ResourceAccess_ResourceFullName").IsUnique();
+        });
 
 
         //model.Entity<UserRole>(prop =>

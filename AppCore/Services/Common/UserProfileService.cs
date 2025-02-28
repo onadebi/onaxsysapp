@@ -12,7 +12,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using OnaxTools.Dto.Http;
+using OnaxTools.Dto.Identity;
 using OnaxTools.Enums.Http;
+using OnaxTools.Services.StackExchangeRedis.Interface;
 using System.Runtime.CompilerServices;
 using static Google.Apis.Auth.JsonWebSignature;
 
@@ -24,10 +26,11 @@ public class UserProfileService : IUserProfileService
     private readonly ISocialAuthService _socialAuthService;
     private readonly IMapper _mapper;
     private readonly IMessageService _messageService;
+    private readonly ICacheService _cacheService;
     private readonly AppSettings _appSettings;
 
     public UserProfileService(ILogger<UserProfileService> logger, AppDbContext context, IOptions<AppSettings> appSettings
-        , ISocialAuthService socialAuthService, IMapper mapper, IMessageService messageService)
+        , ISocialAuthService socialAuthService, IMapper mapper, IMessageService messageService, ICacheService cacheService)
     {
         _logger = logger;
         _context = context;
@@ -35,6 +38,7 @@ public class UserProfileService : IUserProfileService
         _socialAuthService = socialAuthService;
         _mapper = mapper;
         _messageService = messageService;
+        _cacheService = cacheService;
     }
 
     public async Task<GenResponse<UserLoginResponse>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default)
@@ -78,7 +82,7 @@ public class UserProfileService : IUserProfileService
             UserApp userApp = new()
             {
                 OAuthIdentity = null,
-                AppId = _appSettings.AppName,
+                AppId = _appSettings.AppName.ToLower(),
                 UserId = userProfileParams.Guid,
                 UserProfile = userProfileParams,
                 UserRole = ["user"]
@@ -147,6 +151,44 @@ public class UserProfileService : IUserProfileService
         return objResp;
     }
 
+    public async Task<GenResponse<AppUserIdentity>> GetUserWithRolesByUserId(string UserGuid)
+    {
+        AppUserIdentity? objResp = new AppUserIdentity();
+        if (string.IsNullOrWhiteSpace(UserGuid))
+        {
+            return GenResponse<AppUserIdentity>.Failed("Invalid user details requested");
+        }
+        try
+        {
+            var cachedUser = await _cacheService.GetData<AppUserIdentity>($"UserWithRoles_{UserGuid}");
+            if (cachedUser != null)
+            {
+                objResp = cachedUser;
+            }
+            else
+            {
+                objResp = await _context.UserProfiles.Include(m => m.UserProfileUserApps)
+                .Select(u => new AppUserIdentity
+                {
+                    DisplayName = $"{u.FirstName} {u.LastName}",
+                    Email = u.Email,
+                    Guid = u.Guid,
+                    Roles = u.UserProfileUserApps.First((UserApp u) => u.UserId == UserGuid) != null ? u.UserProfileUserApps.First((UserApp u) => u.UserId == UserGuid).UserRole : new List<string>()
+                }).FirstOrDefaultAsync(m => m.Guid == UserGuid);
+
+                if (objResp != null)
+                {
+                    _ = _cacheService.SetData<AppUserIdentity>($"UserWithRoles_{UserGuid}", objResp, 60 * 5);
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError($"[UserServiceRepository][GetUserWIthRoleByUserId] {ex.Message}");
+            return GenResponse<AppUserIdentity>.Failed($"Sorry, an internal error occured. Kindly try again.");
+        }
+        return objResp == null ? GenResponse<AppUserIdentity>.Failed($"No profile found this user id.", StatusCodeEnum.NotFound) : GenResponse<AppUserIdentity>.Success(objResp);
+    }
 
     public async Task<GenResponse<UserLoginResponse>> GoogleLogin(string token, [CallerMemberName] string? caller = null, CancellationToken ct = default)
     {
@@ -162,7 +204,7 @@ public class UserProfileService : IUserProfileService
             var userDetail = await _context.UserProfiles.Include(m => m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLoginEamil);
             if (userDetail != null)
             {
-                var userRoles = userDetail.UserProfileUserApps.Count > 0 ? userDetail.UserProfileUserApps.FirstOrDefault(m => m.AppId == _appSettings.AppName && m.OAuthIdentity == SocialLoginPlatform.Google)?.UserRole : ["user"];
+                var userRoles = userDetail.UserProfileUserApps.Count > 0 ? userDetail.UserProfileUserApps.FirstOrDefault(m => m.AppId == _appSettings.AppName.ToLower() && m.OAuthIdentity == SocialLoginPlatform.Google)?.UserRole : ["user"];
                 UserLoginResponse result = new()
                 {
                     Email = userDetail.Email,
@@ -195,7 +237,7 @@ public class UserProfileService : IUserProfileService
                 UserApp userApp = new()
                 {
                     OAuthIdentity = SocialLoginPlatform.Google,
-                    AppId = _appSettings.AppName,
+                    AppId = _appSettings.AppName.ToLower(),
                     UserId = userProfileParams.Guid,
                     UserProfile = userProfileParams,
                     UserRole = ["user"]
@@ -317,6 +359,7 @@ public class UserProfileService : IUserProfileService
 public interface IUserProfileService
 {
     Task<GenResponse<UserLoginResponse>> RegisterUser(UserModelCreateDto user, [CallerMemberName] string? caller = null, CancellationToken ct = default);
+    Task<GenResponse<AppUserIdentity>> GetUserWithRolesByUserId(string UserGuid);
     Task<GenResponse<UserLoginResponse>> Login(UserLoginDto userLogin, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<UserLoginResponse>> GoogleLogin(string token, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<GoogleOAuthResponse>> VerfiyGoogleAuth(string token);

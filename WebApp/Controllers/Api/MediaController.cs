@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using OnaxTools.Dto.Http;
 using System.Net;
+using WebApp.Helpers.Filters;
 
 namespace WebApp.Controllers.Api;
 
@@ -19,6 +20,7 @@ public class MediaController : ControllerBase
     [HttpPost(nameof(UploadImage))]
     [ProducesResponseType(typeof(GenResponse<string>), (int)HttpStatusCode.OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [AuthAttributeDynamicOnx(nameof(UploadImage))]
     public async Task<IActionResult> UploadImage(IFormFile file)
     {
         GenResponse<string> objResp = await fileManagerSvc.UploadFileToAzBlobAsync(file);
