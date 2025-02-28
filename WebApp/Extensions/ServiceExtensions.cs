@@ -24,6 +24,7 @@ using OnaxTools.Enums.Http;
 using AppGlobal.Services.Logger;
 using AppCore.Services.Helpers;
 using Microsoft.Extensions.Primitives;
+using AppCore.Services.Common;
 
 namespace WebApp.Extensions;
 
@@ -56,6 +57,7 @@ public static class ServiceExtensions
             options.AzureBlobConfig.BlobStoragePath = BlobStoragePath;
             options.ExternalAPIs.GeminiApi.GeminiApiApiKey = GeminiApiKey;
             options.ExternalAPIs.YoutubeApi.YoutubeApiKey = YoutubeApiKeyEnv;
+            options.StartUpAssemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name ??  builder.Environment.ApplicationName;
 
             #region SpeechSynthesis
             options.SpeechSynthesis.SpeechKey = Environment.GetEnvironmentVariable("SpeechKey", EnvironmentVariableTarget.Process) ?? string.Empty;
@@ -307,6 +309,7 @@ public static class ServiceExtensions
         services.AddScoped<IPostCategoryService, PostCategoryService>();
         services.AddScoped<IUserProfileService, UserProfileService>();
         services.AddScoped<ISocialAuthService, SocialAuthService>();
+        services.AddScoped<IResourceAccessService, ResourceAccessService>();
         services.AddScoped<ISpeechService, SpeechService>();
         services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         services.AddScoped<IFileManagerHelperService, FileManagerHelperService>();

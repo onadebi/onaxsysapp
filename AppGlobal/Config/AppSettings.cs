@@ -5,6 +5,7 @@ namespace AppGlobal.Config;
 public class AppSettings
 {
     public string AppName { get; set; } = string.Empty;
+    public string StartUpAssemblyName { get; set; } = string.Empty;
     public string AppKey { get; set; } = string.Empty;
     public bool LogToAppInsights { get; set; }
     public Encryption? Encryption { get; set; }

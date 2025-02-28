@@ -3,10 +3,11 @@ using MongoDB.Bson;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using AppCore.Domain.AppCore.Models.Extensions;
+using AppCore.Domain.AppCore.Config;
 
 namespace AppCore.Domain.AppCore.Models
 {
-    [Table(nameof(UserRole),Schema ="auth")]
+    [Table(nameof(UserRole),Schema = SchemaConstants.AuthSchema)]
     [BsonIgnoreExtraElements]
     public class UserRole: CommonProperties
     {

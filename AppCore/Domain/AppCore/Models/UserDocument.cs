@@ -1,10 +1,11 @@
-﻿using AppCore.Domain.AppCore.Models.Extensions;
+﻿using AppCore.Domain.AppCore.Config;
+using AppCore.Domain.AppCore.Models.Extensions;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace AppCore.Domain.AppCore.Models
 {
-    [Table(nameof(UserDocument), Schema = "profile")]
+    [Table(nameof(UserDocument), Schema = SchemaConstants.ProfileSchema)]
     public class UserDocument: CommonProperties
     {
         [Key]

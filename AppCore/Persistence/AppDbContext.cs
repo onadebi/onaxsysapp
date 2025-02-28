@@ -26,6 +26,8 @@ public class AppDbContext: DbContext
 
     #endregion
     //public DbSet<MessageBox> MessageBoxz { get; set; }
+
+    public DbSet<ResourceAccess> ResourceAccess { get; set; }
     public DbSet<UserProfile> UserProfiles{ get; set; }
     public DbSet<UserApp> UserApps { get; set; }
     public DbSet<UserRole> UserRoles { get; set; }

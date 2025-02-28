@@ -10,6 +10,7 @@ namespace WebApp.Controllers
         {
             return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "portal", "index.html"), "text/html");
         }
+
         public IActionResult Portal()
         {
             return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "portal", "index.html"), "text/html");
