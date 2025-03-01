@@ -1,0 +1,31 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    ViewData["Title"] = "Modal Page test";
+}
+<style>
+    .onax-modal-header h3{
+        text-align: center;
+    }
+</style>
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <button type="button" id="btnModal">Click Here</button>
+</div>
+
+@section Scripts {
+    <script type="module">
+        import ModalPopup from '/js/ModalPopup.js';
+        window.onload = async () => {
+            const modalBodyContent = `@await Html.PartialAsync("/Views/DashboardZone/_ModalPartial.cshtml")`;
+            const modal = new ModalPopup({
+                modalHeader: '<h3>Welcome header</h3>',
+                modalBody: modalBodyContent,
+                modalFooter: 'Copyright 2025',
+                btnOpenModalId: 'btnModal',
+            },
+            {modalFooterBgColor: 'transparent', modalHeaderBgColor: 'cornflowerblue', modalBodyBgColor: 'transparent'});
+        };
+    </script>
+}
