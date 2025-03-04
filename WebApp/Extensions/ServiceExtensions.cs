@@ -276,7 +276,7 @@ public static class ServiceExtensions
         {
             opt.AddPolicy("DefaultCorsPolicy", policy =>
             {
-                policy.WithOrigins("http://localhost:4500", "http://localhost:3000", "https://localhost:4500")
+                policy.WithOrigins("http://localhost:4500", "http://localhost:3000", "https://localhost:4500", "https://apis.google.com", "https://accounts.google.com")
                         .AllowAnyHeader()
                         .AllowAnyMethod()
                         .AllowCredentials();
