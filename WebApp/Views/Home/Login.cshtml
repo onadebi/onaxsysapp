@@ -66,7 +66,7 @@
         let data = ''
         if(response.status === 200){
            data = await response.json();
-           window.localStorage.setItem('onx_token', data.result.token);
+           window.localStorage.setItem('onx_token',JSON.stringify(data));
            window.location.href ='/';
         }else{
            data = await response.json();

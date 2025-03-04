@@ -237,6 +237,7 @@ public class UserProfileService : IUserProfileService
                 UserApp userApp = new()
                 {
                     OAuthIdentity = SocialLoginPlatform.Google,
+                    OAuthGuid = user.JwtId,
                     AppId = _appSettings.AppName.ToLower(),
                     UserId = userProfileParams.Guid,
                     UserProfile = userProfileParams,

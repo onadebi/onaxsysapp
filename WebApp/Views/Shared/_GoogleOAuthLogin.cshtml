@@ -78,7 +78,7 @@
         .then(response => {
             if (response.status === 200) {
                 return response.json().then(data => {
-                    window.localStorage.setItem('onx_token', data.result.token);
+                    window.localStorage.setItem('onx_token', JSON.stringify(data));//data.result.token);
                     window.location.href = '/';
                 });
             } else {
