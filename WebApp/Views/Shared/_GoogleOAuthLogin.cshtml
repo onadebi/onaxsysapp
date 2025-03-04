@@ -1,0 +1,95 @@
+﻿@model String
+
+<style>
+    .custom-google-button {
+        width: 200px;
+        height: 50px;
+    }
+
+    .nsm7Bb-HzV7m-LgbsSe-MJoBVe {
+        background-color: #4285f4 !important;
+        color: white !important;
+    }
+
+    .nsm7Bb-HzV7m-LgbsSe-BPrWId {
+        color: white !important;
+    }
+
+    .nsm7Bb-HzV7m-LgbsSe-Bz112c, .nsm7Bb-HzV7m-LgbsSe-Bz112c-haAclf {
+        display: none !important;
+    }
+</style>
+
+<!-- Google Sign-In Button -->
+<div id="g_id_onload"
+     data-client_id="@Model"
+     data-auto_select="false"
+     data-callback="handleCredentialResponse">
+</div>
+<div class="g_id_signin custom-google-button"
+     data-type="standard"
+     data-size="large"
+     data-theme="filled_blue"
+     data-text="sign_in_with"
+     data-shape="rectangular"
+     data-logo_alignment="left">
+</div>
+
+<script src="https://accounts.google.com/gsi/client" async defer></script>
+<script>
+     // Helper function to decode JWT token
+    function parseJwt (token) {
+        const base64Url = token.split('.')[1];
+        const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        const jsonPayload = decodeURIComponent(window.atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+
+        return JSON.parse(jsonPayload);
+    }
+
+
+
+    // Function to handle successful Google login
+    function handleCredentialResponse(response) {
+        // Log the entire response to the console
+        console.log('Full Response:', response);
+
+        // Log the ID token credential
+        console.log('ID Token:', response.credential);
+
+        // Decode the JWT token to see user details (optional)
+        const decodedToken = parseJwt(response.credential);
+        console.log('Decoded Token Details:', decodedToken);
+        window.alert(`Logged in as ${decodedToken.given_name} ${decodedToken.family_name}`);
+
+
+
+        //#region name -->
+        const objReq = JSON.stringify({token: response.credential});
+        console.log(objReq);
+        fetch('/api/Auth/GoogleLogin', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: objReq
+        })
+        .then(response => {
+            if (response.status === 200) {
+                return response.json().then(data => {
+                    window.localStorage.setItem('onx_token', data.result.token);
+                    window.location.href = '/';
+                });
+            } else {
+                return response.json().then(data => {
+                    alert(JSON.stringify(data));
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Fetch error:', error);
+        });
+        //#endregion -->
+    }
+</script>
