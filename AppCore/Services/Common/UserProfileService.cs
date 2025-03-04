@@ -282,7 +282,7 @@ public class UserProfileService : IUserProfileService
         try
         {
             userLogin.Email = userLogin.Email.Trim().ToLower();
-            var userDetail = await _context.UserProfiles.FirstOrDefaultAsync(m => m.Email == userLogin.Email.ToLower());
+            var userDetail = await _context.UserProfiles.Include(m=> m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLogin.Email.ToLower());
             if (userDetail != null)
             {
                 bool IsValidPwd = false;
@@ -305,7 +305,7 @@ public class UserProfileService : IUserProfileService
                         Email = userDetail.Email,
                         FirstName = userDetail.FirstName,
                         LastName = userDetail.LastName,
-                        Roles = userDetail.UserProfileUserApps.Count > 0 ? [.. userDetail.Roles] : ["user"],
+                        Roles = userDetail.UserProfileUserApps.Count > 0 ? [.. userDetail.UserProfileUserApps.FirstOrDefault()?.UserRole] : ["user"],
                         Guid = userDetail.Guid,
                         Id = userDetail.Id,
                         Picture = userDetail.UserProfileImage
