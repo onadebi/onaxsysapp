@@ -16,6 +16,8 @@ namespace AppCore.Domain.AppCore.Models
 
         public string? OAuthIdentity { get; set; }
 
+        public string? OAuthGuid { get; set; }
+
         [Required]
         public List<string> UserRole { get; set; } = [];
 
