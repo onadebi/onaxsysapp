@@ -491,3 +491,4 @@ $RECYCLE.BIN/
 /AppCore/Migrations/AppDbContextModelSnapshot.cs
 WebApp/Properties/launchSettings.json
 WebApp/Properties/launchSettings.json
+/WebApp/wwwroot/css/tailwindoutput.css
