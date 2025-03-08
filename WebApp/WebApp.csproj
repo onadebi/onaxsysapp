@@ -33,6 +33,10 @@
     <Folder Include="Extensions\Services\" />
   </ItemGroup>
 
+	<Target Name="Tailwind" BeforeTargets="Build">
+		<Exec Command="npm run tw:css" />
+	</Target>
+
   <ItemGroup>
     <EmbeddedResource Include="Templates\ConfirmEmail.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

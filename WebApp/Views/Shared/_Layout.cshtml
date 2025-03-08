@@ -5,58 +5,116 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - OnaxApp</title>
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" />
+    @* <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" /> *@
+    <link rel="stylesheet" href="~/css/tailwindoutput.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+    @* <link rel="stylesheet" href="~/WebApp.styles.css" asp-append-version="true" /> *@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&amp;display=swap" rel="stylesheet">
 </head>
 
 <body>
-    <header>
-        <style>
+    <style>
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0px 25px;
+        }
 
-        </style>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3"
-            style="height:5rem;">
-            <div class="container-fluid  justify-content-between">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@await Html.PartialAsync("_CompanyName")</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
-                    aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1 onax-end">
-                        <li class="nav-item">
-                            @if (User.Identity != null && User.Identity.IsAuthenticated)
-                            {
-                                <span id="spnLogout" class="nav-link text-dark" style="cursor:pointer;">Logout  @User.Claims.FirstOrDefault(c => c.Type == "display_name")?.Value.Split(' ')[0]</span>
-                            }
-                            else
-                            {
-                                <a class="nav-link text-dark" asp-controller="Home" asp-action="Login">Log In</a>
-                            }
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Blog" asp-action="Index">Blog</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" href='@Url.Action("portal","zone")'>Portal</a>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+        .navbar-brand {
+            padding-top: .3125rem;
+            padding-bottom: .3125rem;
+            margin-right: 1rem;
+            font-size: 1.25rem;
+            text-decoration: none;
+            white-space: nowrap;
+            color: rgba(0, 0, 0, .9);
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-item {
+            list-style-type: none;
+        }
+
+        .container, .container-fluid, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+            width: 100%;
+            /* padding-right: var(--bs-gutter-x, .75rem); */
+            /* padding-left: var(--bs-gutter-x, .75rem); */
+            overflow-x: hidden;
+            margin-right: auto;
+            margin-left: auto;
+        }
+
+        @@media (min-width: 576px) {
+            .container, .container-sm {
+                max-width: 540px;
+            }
+        }
+
+        @@media (min-width: 768px) {
+            .container, .container-md, .container-sm {
+                max-width: 720px;
+            }
+        }
+
+        @@media (min-width: 992px) {
+            .container, .container-lg, .container-md, .container-sm {
+                max-width: 960px;
+            }
+        }
+
+        @@media (min-width: 1200px) {
+            .container, .container-lg, .container-md, .container-sm, .container-xl {
+                max-width: 1140px;
+            }
+        }
+
+        @@media (min-width: 1400px) {
+            .container, .container-lg, .container-md, .container-sm, .container-xl, .container-xxl {
+                max-width: 1320px;
+            }
+        }
+
+    </style>
+    <nav class="nav" style="height:5rem; box-shadow: 0 0px 24px 0 rgba(0, 0, 0, 0.1);">
+        <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">@await Html.PartialAsync("_CompanyName")</a>
+        <div class="d-sm-inline-flex justify-content-between">
+            <ul class="navbar-nav text-onaxBlue">
+                <li class="nav-item">
+                    <a class="nav-link md:text-md" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link md:text-md" asp-area="" asp-controller="Blog" asp-action="Index">Blog</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link md:text-md" href='@Url.Action("portal","zone")'>Portal</a>
+                </li>
+                <li class="nav-item">
+                    @if (User.Identity != null && User.Identity.IsAuthenticated)
+                    {
+                        <span id="spnLogout" class="nav-link md:text-md" style="cursor:pointer;">Logout  @User.Claims.FirstOrDefault(c => c.Type == "display_name")?.Value.Split(' ')[0]</span>
+                    }
+                    else
+                    {
+                        <a class="nav-link md:text-md hover:underline" asp-controller="Home" asp-action="Login">Log In</a>
+                    }
+                </li>
+            </ul>
+        </div>
+    </nav>
+    @await RenderSectionAsync("FullWidthTop", required: false)
+    <div class="container" style="">
+        <main role="main" style="padding-bottom:2rem;">
             @RenderBody()
         </main>
     </div>
+    @await RenderSectionAsync("FullWidthBottom", required: false)
 
     @await Html.PartialAsync("_Footer.cshtml")
 
@@ -65,25 +123,27 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
     <script>
-        $(document).ready(function () {
-            $('#spnLogout').click(function () {
-                const logout = confirm('Are you sure you want to logout?');
-                if (logout) {
-                    fetch('/api/auth/logout', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'RequestVerificationToken': $('input:hidden[name="__RequestVerificationToken"]').val()
-                        }
-                    }).then(function (response) {
-                        if (response.ok) {
-                            window.localStorage.removeItem('onx_token');
-                            window.location.href = '@Url.Action("Index", "Home")';
-                        }
-                    });
-                }
-            });
-        });
+        window.onload = function(){
+            const spnLogout = document.querySelector('#spnLogout');
+            if(spnLogout){
+                spnLogout.addEventListener('click',()=>{
+                    const logout = confirm('Are you sure you want to logout?');
+                    if(logout){
+                        fetch('/api/auth/logout',{
+                            method:'POST',
+                            headers:{
+                                'Content-Type':'application/json',
+                            }
+                        }).then(response=>{
+                            if(response.ok){
+                                window.localStorage.removeItem('onx_token');
+                                window.location.href = '@Url.Action("Index", "Home")';
+                            }
+                        });
+                    }
+                });
+            }
+        }
     </script>
 </body>
 

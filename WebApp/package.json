@@ -1,0 +1,20 @@
+{
+  "name": "webapp",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "css:build": "npx tailwindcss -i ./wwwroot/css/tailwindinput.css -o ./wwwroot/css/tailwindoutput.css --watch",
+    "tw:css": "npx tailwindcss -i ./wwwroot/css/tailwindinput.css -o ./wwwroot/css/tailwindoutput.css",
+    "tw:css:prod": "npx tailwindcss -i ./wwwroot/css/tailwindinput.css -o ./wwwroot/css/tailwindoutput.css --minify"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "autoprefixer": "^10.4.20",
+    "eslint": "^9.22.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1"
+  }
+}
