@@ -21,30 +21,36 @@
         .onax-form-group label {
             flex: 1;
         }
+
+        .onax-btn{
+        padding: 10px 15px;
+        border-radius: 8px;
+        width: 100%;
+        }
 </style>
 
-<h1 style="text-align:center;">Login</h1>
+<h1 style="text-align:center;" class="text-4xl mb-3">Login</h1>
 
 <div style="display:flex;justify-content: center;gap:20px;">
     <form method="post" action="/Home/Login">
         <div class="onax-form-group">
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required />
+            <input type="email" id="email" class="border border-1" name="email" required />
         </div>
         <div class ="onax-form-group">
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required />
+            <input type="password" id="password" class="border border-1" name="password" required />
         </div>
         <div style="display:flex; padding: 5px; gap:15px; align-items:center; justify-content:center;">
-            <button type="reset">Clear</button>
-            <button type="submit">Login</button>
+            <button type="reset" class="onax-btn" style="background-color:#d6d6d6;">Clear</button>
+            <button type="submit" class="onax-btn" style="background-color: cornflowerblue;">Login</button>
+        </div>
+
+
+        <div style="display: flex;align-items: center;justify-content: center;margin-top: 15px;">
+            @await Html.PartialAsync("/Views/Shared/_GoogleOAuthLogin.cshtml", new String("876938636452-ck8pmi1niv5vsmtj7842ajaiu01nk04g.apps.googleusercontent.com"))
         </div>
     </form>
-
-
-    <div>
-        @await Html.PartialAsync("/Views/Shared/_GoogleOAuthLogin.cshtml", new String("876938636452-ck8pmi1niv5vsmtj7842ajaiu01nk04g.apps.googleusercontent.com"))
-    </div>
 </div>
 
 
