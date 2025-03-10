@@ -1,1 +1,1 @@
-[![Build and deploy .NET core to Web App](https://github.com/onadebi/onaxsysapp/actions/workflows/onaxapp-deploy.yaml/badge.svg)](https://github.com/onadebi/onaxsysapp/actions/workflows/onaxapp-deploy.yaml)
+[![Build and deploy .NET core to Web App](https://github.com/onadebi/onaxsysapp/actions/workflows/onaxapp-deploy.yaml/badge.svg)](https://github.com/onadebi/onaxsysapp/actions/workflows/onaxapp-test-deploy.yaml)
