@@ -95,18 +95,8 @@ jobs:
 
   publish_to_dockerhub:
     runs-on: ubuntu-latest
-    needs: test_and_build_app
     if: github.ref == 'refs/heads/main'
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup Node.js
-      uses: actions/setup-node@v3
-      with:
-        node-version: '20.16.0'
-    - name: Setup .NET SDK
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: ${{ env.DOTNET_CORE_VERSION }}
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
