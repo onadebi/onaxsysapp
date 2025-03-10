@@ -78,9 +78,15 @@ jobs:
     - name : Save Docker Image as tar
       working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
-          docker save ${{env.APP_WEBAPP_NAME}}:${{ env.SHORT_SHA }} -o ${{env.APP_WEBAPP_NAME}}.tar
-          chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
-          ls -l
+        docker save ${{env.APP_WEBAPP_NAME}}:${{ env.SHORT_SHA }} -o ${{env.APP_WEBAPP_NAME}}.tar
+        chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
+        ls -l
+
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: docker-image
+        path: ${{ env.WORKING_DIRECTORY }}/${{env.APP_WEBAPP_NAME}}.tar
 
     #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
