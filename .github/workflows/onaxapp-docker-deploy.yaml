@@ -88,10 +88,11 @@ jobs:
         name: ${{env.APP_WEBAPP_NAME}}.tar
         path: ${{ env.WORKING_DIRECTORY }}/${{env.APP_WEBAPP_NAME}}.tar
 
-    - name: Display artifact path
+    - name: Display artifact URL
       run: |
-        echo "Artifact full path: $RUNNER_TEMP/artifacts/${{env.APP_WEBAPP_NAME}}.tar"
-        ls -l $RUNNER_TEMP/artifacts/
+        echo "Artifact URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
+        echo "Repository: ${{ github.repository }}"
+        echo "Run ID: ${{ github.run_id }}"
 
     #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
