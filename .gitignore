@@ -16,7 +16,8 @@
 OnaxApp
 AppCore/Migrations
 AppCore/Migrations/AppDbContextModelSnapshot.cs
-WebApp/wwwroot/portal
+WebApp/wwwroot/portal/*
+!WebApp/wwwroot/portal/robots.txt
 docker-compose.override.yml
 
 # User-specific files (MonoDevelop/Xamarin Studio)
