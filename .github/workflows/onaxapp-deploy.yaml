@@ -58,26 +58,34 @@ jobs:
         echo "==========Verify Frontend Build (List Dir.)============"
         ls -l ${{ env.WORKING_DIRECTORY }}/${{env.PUBLISH_PATH_UI}}
 
-    - name: Build
+    - name: Install Node for MVC TailwindCSS NodeJS dependencies
       run: |
           echo "==========Install Node for TailwindCSS NodeJS dependencies============"
-          apt-get update && \
-          apt-get install -y curl && \
-          curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-          apt-get install -y nodejs && \
-          npm install -g npm@latest && \
-          apt-get clean && \
-          rm -rf /var/lib/apt/lists/*
-          node --version
-          npm --version
-          echo "==========Building Server App============"
-          dotnet build ${{ env.WORKING_DIRECTORY_SERVER }} --configuration ${{ env.CONFIGURATION }} --no-restore
+          sudo apt-get update && \
+          sudo apt-get install -y curl && \
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash - && \
+          sudo apt-get install -y nodejs && \
+          sudo npm install -g npm@latest && \
+          sudo apt-get clean && \
+          sudo rm -rf /var/lib/apt/lists/*
+          
+          
     - name: Test
       working-directory: ${{ env.WORKING_DIRECTORY}}/AppTest
       run: |
           echo "==========Running Tests============"
           ls -l
           dotnet test --no-build
+    - name : Build Server App
+      working-directory: ${{ env.WORKING_DIRECTORY_SERVER }}
+      run: |
+          echo "==========Building Server App============"
+          node --version
+          npm --version
+          ls -l
+          npm install
+          ls -l
+          dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
     #region Publish to Azure Web App      
     # - name: Publish
     #   run: |

@@ -36,6 +36,9 @@ jobs:
     needs: frontend_env_dependencies
     steps:
     - uses: actions/checkout@v4
+    - name: Set Environment Variables into Github Actions
+      run: |
+          echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_ENV
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
@@ -68,14 +71,27 @@ jobs:
     - name : Build Docker Image
       working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
-          docker build --no-cache -t ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -f ${{ env.PROJECT_DIRECTORY_NAME }}/Dockerfile .
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)
+          echo "Short SHA: ${{ env.SHORT_SHA }}"
+          docker build --no-cache -t ${{env.APP_WEBAPP_NAME}}:${{ env.SHORT_SHA }} -f ${{ env.PROJECT_DIRECTORY_NAME }}/Dockerfile .
 
     - name : Save Docker Image as tar
       working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
-          docker save ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -o ${{env.APP_WEBAPP_NAME}}.tar
-          chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
-          ls -l
+        docker save ${{env.APP_WEBAPP_NAME}}:${{ env.SHORT_SHA }} -o ${{env.APP_WEBAPP_NAME}}.tar
+        chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
+        ls -l
+
+    - name: Upload Docker image artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ${{env.APP_WEBAPP_NAME}}.tar
+        path: ${{ env.WORKING_DIRECTORY }}/${{env.APP_WEBAPP_NAME}}.tar
+
+    - name: Display artifact URL
+      run: |
+        echo "Artifact full path: $RUNNER_TEMP/artifacts/${{env.APP_WEBAPP_NAME}}.tar"
+        echo "Artifact URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
 
     #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
