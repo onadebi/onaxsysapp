@@ -56,7 +56,19 @@ jobs:
     - name: Verify Frontend Build
       run: |
         echo "==========Verify Frontend Build (List Dir.)============"
-        ls -l ${{ env.WORKING_DIRECTORY }}/${{env.PUBLISH_PATH_UI}}        
+        ls -l ${{ env.WORKING_DIRECTORY }}/${{env.PUBLISH_PATH_UI}}
+
+    - name: Install Node for MVC TailwindCSS NodeJS dependencies
+      run: |
+          echo "==========Install Node for TailwindCSS NodeJS dependencies============"
+          sudo apt-get update && \
+          sudo apt-get install -y curl && \
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash - && \
+          sudo apt-get install -y nodejs && \
+          sudo npm install -g npm@latest && \
+          sudo apt-get clean && \
+          sudo rm -rf /var/lib/apt/lists/*
+          
           
     - name: Test
       working-directory: ${{ env.WORKING_DIRECTORY}}/AppTest
@@ -64,18 +76,29 @@ jobs:
           echo "==========Running Tests============"
           ls -l
           dotnet test --no-build
-    - name : Build Docker Image
+    - name : Build Server App
       working-directory: ${{ env.WORKING_DIRECTORY_SERVER }}
       run: |
           echo "==========Building Server App============"
-          docker build -t ${{env.APP_WEBAPP_NAME}}:${{github.sha}} .
-
-    - name : Save Docker Image as tar
-      working-directory: ${{ env.WORKING_DIRECTORY_SERVER }}
-      run: |
-          echo "==========Building Server App============"
-          docker save ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -o ${{env.APP_WEBAPP_NAME}}.tar
-          chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
+          node --version
+          npm --version
+          ls -l
+          npm install
+          ls -l
+          dotnet build --configuration ${{ env.CONFIGURATION }} --no-restore
+    #region Publish to Azure Web App      
+    # - name: Publish
+    #   run: |
+    #       set -e
+    #       dotnet publish ${{ env.WORKING_DIRECTORY }} --configuration ${{ env.CONFIGURATION }} --no-build --output ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    #       echo "==========Verify Frontend Migration to build output============"
+    #       ls -l ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}/wwwroot
+    # - name: Publish Artifacts
+    #   uses: actions/upload-artifact@v3
+    #   with:
+    #     name: webapp
+    #     path: ${{ env.AZURE_WEBAPP_PACKAGE_PATH }}
+    #endregion Publish to Azure Web App
 
     #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
@@ -98,3 +121,4 @@ jobs:
           DOCKER_HUB_USERNAME=${{ secrets.DOCKER_HUB_USERNAME }}
           DOCKER_HUB_PASSWORD=${{ secrets.DOCKER_HUB_PASSWORD }}
     #endregion Build docker image and publish to Docker Hub with docker login credentials
+    
