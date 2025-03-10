@@ -3,8 +3,8 @@ name: Build and deploy OnaxApp via Docker Image
 on:
     push:
       branches:
-      - main
-      # - dev
+      # - main
+      - dev
 
 env:
     APP_WEBAPP_NAME: onaxapp
@@ -36,6 +36,9 @@ jobs:
     needs: frontend_env_dependencies
     steps:
     - uses: actions/checkout@v4
+    - name: Set Environment Variables into Github Actions
+      run: |
+          echo "SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)" >> $GITHUB_ENV
     - name: Setup .NET SDK
       uses: actions/setup-dotnet@v3
       with:
@@ -68,12 +71,14 @@ jobs:
     - name : Build Docker Image
       working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
-          docker build --no-cache -t ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -f ${{ env.PROJECT_DIRECTORY_NAME }}/Dockerfile .
+          SHORT_SHA=$(echo $GITHUB_SHA | cut -c1-8)
+          echo "Short SHA: ${{ env.SHORT_SHA }}"
+          docker build --no-cache -t ${{env.APP_WEBAPP_NAME}}:${{ env.SHORT_SHA }} -f ${{ env.PROJECT_DIRECTORY_NAME }}/Dockerfile .
 
     - name : Save Docker Image as tar
       working-directory: ${{ env.WORKING_DIRECTORY }}
       run: |
-          docker save ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -o ${{env.APP_WEBAPP_NAME}}.tar
+          docker save ${{env.APP_WEBAPP_NAME}}:${{ env.SHORT_SHA }} -o ${{env.APP_WEBAPP_NAME}}.tar
           chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
           ls -l
 
