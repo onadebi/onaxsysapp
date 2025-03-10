@@ -3,8 +3,8 @@ name: Build and deploy .NET core to Web App
 on:
     push:
       branches:
-      - main
-      # - dev
+      # - main
+      - dev
 
 env:
     APP_WEBAPP_NAME: onaxapp
@@ -70,14 +70,15 @@ jobs:
           rm -rf /var/lib/apt/lists/*
           node --version
           npm --version
-          echo "==========Building Server App============"
-          dotnet build ${{ env.WORKING_DIRECTORY_SERVER }} --configuration ${{ env.CONFIGURATION }} --no-restore
+          
     - name: Test
       working-directory: ${{ env.WORKING_DIRECTORY}}/AppTest
       run: |
           echo "==========Running Tests============"
           ls -l
           dotnet test --no-build
+          echo "==========Building Server App============"
+          dotnet build ${{ env.WORKING_DIRECTORY_SERVER }} --configuration ${{ env.CONFIGURATION }} --no-restore
     #region Publish to Azure Web App      
     # - name: Publish
     #   run: |
