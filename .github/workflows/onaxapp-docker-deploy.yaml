@@ -61,13 +61,13 @@ jobs:
     - name: Build
       run: |
           echo "==========Install Node for TailwindCSS NodeJS dependencies============"
-          apt-get update && \
-          apt-get install -y curl && \
-          curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
-          apt-get install -y nodejs && \
-          npm install -g npm@latest && \
-          apt-get clean && \
-          rm -rf /var/lib/apt/lists/*
+          sudo apt-get update && \
+          sudo apt-get install -y curl && \
+          curl -fsSL https://deb.nodesource.com/setup_20.x | sudo bash - && \
+          sudo apt-get install -y nodejs && \
+          sudo npm install -g npm@latest && \
+          sudo apt-get clean && \
+          sudo rm -rf /var/lib/apt/lists/*
           
           
     - name: Test
