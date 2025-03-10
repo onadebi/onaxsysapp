@@ -77,6 +77,9 @@ jobs:
           echo "==========Running Tests============"
           ls -l
           dotnet test --no-build
+    - name : Build Server App
+      working-directory: ${{ env.WORKING_DIRECTORY }}
+      run: |
           echo "==========Building Server App============"
           dotnet build ${{ env.WORKING_DIRECTORY_SERVER }} --configuration ${{ env.CONFIGURATION }} --no-restore
     #region Publish to Azure Web App      
