@@ -9,12 +9,28 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# Install Node.js
+RUN apt-get update && \
+    apt-get install -y curl && \
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash - && \
+    apt-get install -y nodejs && \
+    npm install -g npm@latest && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Copy project files
 COPY ["WebApp/WebApp.csproj", "WebApp/"]
 COPY ["AppCore/AppCore.csproj", "AppCore/"]
 COPY ["AppGlobal/AppGlobal.csproj", "AppGlobal/"]
+
+# Return to src directory and restore .NET dependencies
+WORKDIR /src
 RUN dotnet restore "./WebApp/WebApp.csproj"
 COPY . .
+
 WORKDIR "/src/WebApp"
+RUN npm install
 RUN dotnet build "./WebApp.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
