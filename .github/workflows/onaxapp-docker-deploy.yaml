@@ -90,13 +90,10 @@ jobs:
 
     - name: Display artifact URL
       run: |
-        echo "Artifact URL: ${{ steps.upload-artifact.outputs.artifact_url }}"
-        echo "Artifact URL: $RUNNER_DOWNLOAD_URL/${{ github.repository }}/${{ env.APP_WEBAPP_NAME }}.tar"
+        echo "Artifact URL: ${{ steps.upload-artifact.outputs }}"
         echo "Artifact full path: $RUNNER_TEMP/artifacts/${{env.APP_WEBAPP_NAME}}.tar"
-        echo "Artifact URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts/${{env.APP_WEBAPP_NAME}}.tar"
         echo "Artifact URL: https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}/artifacts"
-        echo "Repository: ${{ github.repository }}"
-        echo "Run ID: ${{ github.run_id }}"
+        echo "Artifact ID: ${{ steps.upload-artifact.outputs.artifact-id }}"
 
     #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
