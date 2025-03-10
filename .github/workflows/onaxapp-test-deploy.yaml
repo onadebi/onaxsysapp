@@ -1,4 +1,4 @@
-name: Build and deploy OnaxApp via Docker Image
+name: Build, Test, Deploy Docker Image
 
 on:
   push:
