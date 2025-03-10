@@ -67,13 +67,11 @@ jobs:
     - name : Build Docker Image
       working-directory: ${{ env.WORKING_DIRECTORY_SERVER }}
       run: |
-          echo "==========Building Server App============"
-          docker build -t ${{env.APP_WEBAPP_NAME}}:${{github.sha}} .
+          docker build --no-cache -t ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -f ${{ env.WORKING_DIRECTORY_SERVER }}/Dockerfile .
 
     - name : Save Docker Image as tar
       working-directory: ${{ env.WORKING_DIRECTORY_SERVER }}
       run: |
-          echo "==========Building Server App============"
           docker save ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -o ${{env.APP_WEBAPP_NAME}}.tar
           chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
 
