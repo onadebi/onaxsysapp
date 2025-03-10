@@ -2,9 +2,10 @@ name: Build and deploy OnaxApp via Docker Image
 
 on:
     push:
-      branches: []
+      branches:
       # - main
       # - dev
+      - hotfix/*
 
 env:
     APP_WEBAPP_NAME: onaxapp
