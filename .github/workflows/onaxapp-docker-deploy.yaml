@@ -1,10 +1,10 @@
-name: Build and deploy .NET core to Web App
+name: Build and deploy OnaxApp via Docker Image
 
 on:
     push:
       branches:
-      # - main
-      - dev
+      - main
+      # - dev
 
 env:
     APP_WEBAPP_NAME: onaxapp
@@ -75,6 +75,7 @@ jobs:
       run: |
           docker save ${{env.APP_WEBAPP_NAME}}:${{github.sha}} -o ${{env.APP_WEBAPP_NAME}}.tar
           chmod 775 ${{env.APP_WEBAPP_NAME}}.tar
+          ls -l
 
     #region Build docker image and publish to Docker Hub with docker login credentials [ONly when branch is ***main***]
     - name: Log in to Docker Hub
