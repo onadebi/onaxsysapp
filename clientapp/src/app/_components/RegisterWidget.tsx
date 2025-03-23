@@ -1,7 +1,6 @@
 import { FormEvent, useRef } from "react";
 import { CredentialResponse, GoogleLogin } from "@react-oauth/google";
 import RouteTo from "./RouteTo";
-// import AuthUserLoginDto from "../common/models/AuthUserLoginDto";
 import GenResponse from "../common/config/GenResponse";
 import { UserAccountCreateDTO } from "../common/models/UserLoginResponse";
 
@@ -17,7 +16,6 @@ interface RegisterWidgetProps<T> {
 
 const RegisterWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signInRoute,allowSocialLogin=true, loadingText="Processing..."}: RegisterWidgetProps<T>) => {
 
-//   const [respData, setRespData] = React.useState<GenResponse<T>>(new GenResponse<T>());
   const btnRef = useRef<HTMLButtonElement>(null);
   const LoginSuccess = async (credentialResponse: CredentialResponse) => {
     if (btnRef.current)
@@ -35,11 +33,9 @@ const RegisterWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signInRoute,a
                 },
                 body: JSON.stringify({token: credentialResponse.credential})
             });
-        //   if(onSuccess){onSuccess(GenResponse.Result<T>(credentialResponse);}
           if(objResp?.status){
             const objRespData = (await objResp.json()) as GenResponse<T>;
             if(objRespData.isSuccess && objRespData.result){
-                // alert(JSON.stringify(objRespData));
                 if(onSuccess){onSuccess(GenResponse.Result(objRespData.result));}
             }else{
                 if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
@@ -51,7 +47,6 @@ const RegisterWidget = <T,>({onError,onSuccess,apiUrl,googleApiUrl,signInRoute,a
         }
         }
         catch{
-            // alert('An error occured. Kindly retry again.');
             if(onError){onError(GenResponse.Failed<T>(null as unknown as T,"Login Failed"));}
         }finally{
             if (btnRef.current) {

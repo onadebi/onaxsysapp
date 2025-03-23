@@ -25,6 +25,7 @@ using AppGlobal.Services.Logger;
 using AppCore.Services.Helpers;
 using Microsoft.Extensions.Primitives;
 using AppCore.Services.Common;
+using WebApp.Hubs;
 
 namespace WebApp.Extensions;
 
@@ -352,6 +353,11 @@ public static class ServiceExtensions
         //services.AddScoped<IMedicCompanyRepository, MedicCompanyRepository>();
         //services.AddScoped<IMedicBranchRepository, MedicBranchRepository>();
         //services.AddScoped<IFilesUploadHelperService, FilesUploadHelperService>();
+        services.AddScoped<AppNotificationHub>();
+        services.AddSignalR(options =>
+        {
+            options.EnableDetailedErrors = true;
+        });
 
         return services;
     }
