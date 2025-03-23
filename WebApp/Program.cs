@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.FileProviders;
 using WebApp.Extensions;
+using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +85,8 @@ app.Use(async (context, next) =>
     Console.WriteLine($"Response::[{resp.StatusCode}]");
     await next(context);
 });
+
+app.MapHub<AppNotificationHub>("/notificationshub");
 
 app.MapControllerRoute(
     name: "default",

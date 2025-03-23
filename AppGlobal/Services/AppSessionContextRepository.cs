@@ -22,7 +22,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
         this._sessionConfig = sessionConfig.Value;
     }
 
-    public AppSessionData<AppUserIdentity> GetUserDataFromSession()
+    public AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true)
     {
         AppSessionData<AppUserIdentity> objResp = new();
         try
@@ -37,6 +37,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
                 if (userClaimsData.IsSuccess && userClaimsData.Result != null)
                 {
                     objResp.Data = userClaimsData.Result;
+                    if (excludeDetails) { objResp.Data.ExpiresAt = objResp.Data.CreatedAt = DateTime.Now.AddYears(100); }
                     objResp.Email = userClaimsData.Result.Email;
                     return objResp;
                 }
@@ -70,7 +71,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
 
     public async Task<GenResponse<AppUserIdentity>> GetUserDetails()
     {
-        if(_contextAccessor.HttpContext == null)
+        if (_contextAccessor.HttpContext == null)
         {
             return GenResponse<AppUserIdentity>.Failed("Invalid token credentials");
         }
@@ -114,6 +115,6 @@ public class AppSessionContextRepository : IAppSessionContextRepository
 
 public interface IAppSessionContextRepository
 {
-    AppSessionData<AppUserIdentity> GetUserDataFromSession();
+    AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true);
     void ClearCurrentUserDataFromSession();
 }
