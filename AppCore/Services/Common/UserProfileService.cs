@@ -284,18 +284,18 @@ public class UserProfileService : IUserProfileService
         try
         {
             userLogin.Email = userLogin.Email.Trim().ToLower();
-            var userDetail = await _context.UserProfiles.Include(m=> m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLogin.Email.ToLower());
+            var userDetail = await _context.UserProfiles.Include(m=> m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLogin.Email.ToLower(), cancellationToken: ct);
             if (userDetail != null)
             {
-                //bool IsValidPwd = false;
-                //if (!string.IsNullOrWhiteSpace(userDetail.Password) && !string.IsNullOrWhiteSpace(userLogin.Password))
-                //{
-                bool IsValidPwd = OnaxTools.Cryptify.EncryptSHA512(userLogin.Password).Equals(userDetail.Password);
+                bool IsValidPwd = false;
+                if (!string.IsNullOrWhiteSpace(userDetail.Password) && !string.IsNullOrWhiteSpace(userLogin.Password))
+                {
+                    IsValidPwd = OnaxTools.Cryptify.EncryptSHA512(userLogin.Password).Equals(userDetail.Password);
                     if (!IsValidPwd)
                     {
                         return GenResponse<UserLoginResponse>.Failed("Invalid email/password supplied.", StatusCodeEnum.Unauthorized);
                     }
-                //}
+                }
                 if (userDetail.IsDeactivated || userDetail.IsDeleted)
                 {
                     return GenResponse<UserLoginResponse>.Failed("User account is currently deactivated or deleted.", StatusCodeEnum.Forbidden);
