@@ -1,10 +1,10 @@
 ﻿using AppGlobal.Config;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using OnaxTools.Dto.Http;
 using OnaxTools.Dto.Identity;
-using System.IdentityModel.Tokens.Jwt;
 using System.Runtime.CompilerServices;
 using System.Security.Claims;
 using System.Text;
@@ -47,11 +47,11 @@ public class TokenService
             Expires = DateTime.UtcNow.AddMinutes(expireInMins),
             SigningCredentials = creds,
         };
-        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenHandler = new JsonWebTokenHandler();
         try
         {
-            var token = tokenHandler.CreateToken(tokenDescriptor);
-            objResp = tokenHandler.WriteToken(token);
+            //var token = tokenHandler.CreateToken(tokenDescriptor);
+            objResp = tokenHandler.CreateToken(tokenDescriptor);
         }
         catch (Exception ex)
         {
@@ -73,7 +73,7 @@ public class TokenService
         {
             return GenResponse<AppUserIdentity>.Failed("Invalid/Expired token credentials");
         }
-        var tokenHandler = new JwtSecurityTokenHandler();
+        var tokenHandler = new JsonWebTokenHandler();
         var key = Encoding.ASCII.GetBytes(_encryptionKey);
 
         try
@@ -83,21 +83,18 @@ public class TokenService
             if (authHeader != null || !string.IsNullOrWhiteSpace(cookieValue))
             {
                 string authToken = !string.IsNullOrWhiteSpace(cookieValue) ? cookieValue : authHeader!.Split(" ")[1];
-                var jwtTokenHandler = new JwtSecurityTokenHandler();
+                var jwtTokenHandler = new JsonWebTokenHandler();
 
-                jwtTokenHandler.ValidateToken(authToken, new TokenValidationParameters
+                var result = jwtTokenHandler.ValidateTokenAsync(authToken, new TokenValidationParameters
                 {
                     ValidateIssuerSigningKey = true,
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    // set clockskew to zero so tokens expire exactly at token expiration time (instead of 5 minutes later)
                     ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
+                }).Result;
 
-                var jwtoken = (JwtSecurityToken)validatedToken;
-
-                if (jwtoken != null)
+                if (result.IsValid && result.SecurityToken is JsonWebToken jwtoken)
                 {
                     Dictionary<string, string> tokenValues = new Dictionary<string, string>();
                     foreach (var claim in jwtoken.Claims)
@@ -115,7 +112,7 @@ public class TokenService
                     {
                         var AppUserIdentity = new AppUserIdentity
                         {
-                            Email = tokenValues["email"],
+                            Email = tokenValues[ClaimTypes.Sid],
                             DisplayName = tokenValues["display_name"],
                             Guid = tokenValues["guid"],
                             Id = Convert.ToInt32(tokenValues[ClaimTypes.Sid]),
@@ -154,6 +151,7 @@ public class TokenService
                         objResp = GenResponse<AppUserIdentity>.Failed("Invalid token credentials");
                     }
                 }
+                else { objResp = GenResponse<AppUserIdentity>.Failed("Invalid token credentials"); }
             }
             else { objResp = GenResponse<AppUserIdentity>.Failed("Invalid token credentials"); }
         }

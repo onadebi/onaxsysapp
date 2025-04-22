@@ -1,4 +1,5 @@
 ﻿using AppCore.Domain.AppCore.Dto;
+using AppCore.Domain.AppCore.Enums;
 using AppCore.Domain.AppCore.Models;
 using AppCore.Persistence;
 using AppGlobal.Config;
@@ -283,7 +284,7 @@ public class UserProfileService : IUserProfileService
         try
         {
             userLogin.Email = userLogin.Email.Trim().ToLower();
-            var userDetail = await _context.UserProfiles.Include(m=> m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLogin.Email.ToLower());
+            var userDetail = await _context.UserProfiles.Include(m=> m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == userLogin.Email.ToLower(), cancellationToken: ct);
             if (userDetail != null)
             {
                 bool IsValidPwd = false;
@@ -354,6 +355,59 @@ public class UserProfileService : IUserProfileService
         return objResp;
     }
 
+
+    public async Task<GenResponse<AppUserIdentity?>> FindUserByEmailOrGuid(string searchParam, UserLookUpByEmailOrGuidEnum option = UserLookUpByEmailOrGuidEnum.Email)
+    {
+        GenResponse<AppUserIdentity?> objResp = new() { Result = new() };
+        if(string.IsNullOrWhiteSpace(searchParam))
+        {
+            objResp.Error = "Invalid search parameter.";
+            objResp.StatCode = (int)StatusCodeEnum.BadRequest;
+            return objResp;
+        }
+        try
+        {
+            if(option == UserLookUpByEmailOrGuidEnum.Email)
+            {
+                var user = await _context.UserProfiles.Include(m => m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Email == searchParam);
+                if (user != null)
+                {
+                    objResp.Result = new AppUserIdentity()
+                    {
+                        DisplayName = $"{user.FirstName} {user.LastName}",
+                        Email = user.Email,
+                        Guid = user.Guid,
+                        Roles = user.UserProfileUserApps.Count > 0 ? user.UserProfileUserApps.FirstOrDefault(m => m.UserId == user.Guid)?.UserRole : []
+                    };
+                    objResp.StatCode = (int)StatusCodeEnum.OK;
+                    objResp.IsSuccess = true;
+                }
+            }
+            else
+            {
+                var user = await _context.UserProfiles.Include(m => m.UserProfileUserApps).FirstOrDefaultAsync(m => m.Guid == searchParam);
+                if (user != null)
+                {
+                    objResp.Result = new AppUserIdentity()
+                    {
+                        DisplayName = $"{user.FirstName} {user.LastName}",
+                        Email = user.Email,
+                        Guid = user.Guid,
+                        Roles = user.UserProfileUserApps.Count > 0 ? user.UserProfileUserApps.FirstOrDefault(m => m.UserId == user.Guid)?.UserRole : []
+                    };
+                    objResp.StatCode = (int)StatusCodeEnum.OK;
+                    objResp.IsSuccess = true;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, $"Error occured in [{nameof(FindUserByEmailOrGuid)}].");
+            objResp.Error = "Google authentication failed";
+            objResp.StatCode = (int)StatusCodeEnum.ServerError;
+        }
+        return objResp;
+    }
 }
 
 
@@ -364,4 +418,12 @@ public interface IUserProfileService
     Task<GenResponse<UserLoginResponse>> Login(UserLoginDto userLogin, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<UserLoginResponse>> GoogleLogin(string token, [CallerMemberName] string? caller = null, CancellationToken ct = default);
     Task<GenResponse<GoogleOAuthResponse>> VerfiyGoogleAuth(string token);
+
+    /// <summary>
+    /// Find user by email or guid. Default is by email
+    /// </summary>
+    /// <param name="searchParam"></param>
+    /// <param name="option"></param>
+    /// <returns>GenResponse<AppUserIdentity?></returns>
+    Task<GenResponse<AppUserIdentity?>> FindUserByEmailOrGuid(string searchParam, UserLookUpByEmailOrGuidEnum option = UserLookUpByEmailOrGuidEnum.Email);
 }

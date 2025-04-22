@@ -21,11 +21,14 @@ namespace WebApp.Controllers.Api
         private readonly TokenService _tokenService;
         private readonly IUserProfileService _userProfileSvc;
         private readonly IHttpContextAccessor _contextAccessor;
+        private readonly IAppSessionContextRepository _appSessionContextRepository;
         private readonly AppSettings _appSettings;
 
-        public AuthController(IUserProfileService _userProfileSvc, TokenService tokenService, IHttpContextAccessor contextAccessor, IOptions<AppSettings> appSettings)
+        public AuthController(IUserProfileService _userProfileSvc, TokenService tokenService, IHttpContextAccessor contextAccessor
+            , IOptions<AppSettings> appSettings, IAppSessionContextRepository appSessionContextRepository)
         {
             _contextAccessor = contextAccessor;
+            this._appSessionContextRepository = appSessionContextRepository;
             this._userProfileSvc = _userProfileSvc;
             _tokenService = tokenService;
             _appSettings = appSettings.Value;
@@ -43,6 +46,18 @@ namespace WebApp.Controllers.Api
                 await _contextAccessor.HttpContext.SignOutAsync(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme);
             }
             return Ok(true);
+        }
+
+        [HttpPost(nameof(Me))]
+        [ProducesResponseType(typeof(GenResponse<bool>), (int)HttpStatusCode.OK)]
+        public IActionResult Me()
+        {
+            AppSessionData<AppUserIdentity>? objResp = _appSessionContextRepository.GetUserDataFromSession();
+            if (objResp != null && objResp.Data != null)
+            {
+                return StatusCode( StatusCodes.Status200OK,GenResponse<AppSessionData<AppUserIdentity>>.Success(objResp));
+            }
+            return NotFound(GenResponse<string>.Failed(null, OnaxTools.Enums.Http.StatusCodeEnum.NotFound));
         }
 
         [AllowAnonymous]

@@ -76,7 +76,13 @@
            window.location.href ='/';
         }else{
            data = await response.json();
-           alert(JSON.stringify(data));
+             toastr.options = {
+                "closeButton": true,
+                "newestOnTop": true,
+                "progressBar": true,
+                "positionClass": "toast-top-right"
+             }
+           toastr.error(JSON.stringify((data && data.error) ? data.error : "Invalid login details"));
         }
     });
 </script>

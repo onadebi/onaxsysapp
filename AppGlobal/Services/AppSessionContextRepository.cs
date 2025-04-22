@@ -4,10 +4,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Primitives;
 using OnaxTools.Dto.Identity;
-using System.IdentityModel.Tokens.Jwt;
+//using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using OnaxTools.Dto.Http;
 using AppGlobal.Helpers;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 namespace AppGlobal.Services;
 public class AppSessionContextRepository : IAppSessionContextRepository
@@ -22,7 +23,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
         this._sessionConfig = sessionConfig.Value;
     }
 
-    public AppSessionData<AppUserIdentity> GetUserDataFromSession()
+    public AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true)
     {
         AppSessionData<AppUserIdentity> objResp = new();
         try
@@ -32,11 +33,17 @@ public class AppSessionContextRepository : IAppSessionContextRepository
             {
 
                 _contextAccessor.HttpContext.Request.Cookies.TryGetValue(_sessionConfig.SessionConfig.Auth.token, out cookieValue);
+                if (string.IsNullOrWhiteSpace(cookieValue))
+                {
+                    //Get from Bearer token
+                    cookieValue = _contextAccessor.HttpContext.Request.Headers.Authorization.FirstOrDefault(m => m != null && m.StartsWith("Bearer"))?.Split(" ")[1];
+                }
                 #region First get by claims
                 GenResponse<AppUserIdentity> userClaimsData = _tokenService.ValidateToken(_contextAccessor.HttpContext);
                 if (userClaimsData.IsSuccess && userClaimsData.Result != null)
                 {
                     objResp.Data = userClaimsData.Result;
+                    if (excludeDetails) { objResp.Data.ExpiresAt = objResp.Data.CreatedAt = DateTime.Now.AddYears(100); }
                     objResp.Email = userClaimsData.Result.Email;
                     return objResp;
                 }
@@ -70,7 +77,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
 
     public async Task<GenResponse<AppUserIdentity>> GetUserDetails()
     {
-        if(_contextAccessor.HttpContext == null)
+        if (_contextAccessor.HttpContext == null)
         {
             return GenResponse<AppUserIdentity>.Failed("Invalid token credentials");
         }
@@ -91,9 +98,9 @@ public class AppSessionContextRepository : IAppSessionContextRepository
                 if (authHeader != null || !string.IsNullOrWhiteSpace(cookieValue) || !string.IsNullOrWhiteSpace(appuser_id))
                 {
                     string authToken = !string.IsNullOrWhiteSpace(cookieValue) ? cookieValue : !string.IsNullOrWhiteSpace(authHeader) ? authHeader.Split(" ")[1] : string.Empty;
-                    var jwtTokenHandler = new JwtSecurityTokenHandler();
+                    var jwtTokenHandler = new JsonWebTokenHandler();
 
-                    JwtSecurityToken read = jwtTokenHandler.ReadJwtToken(authToken);
+                    JsonWebToken read = jwtTokenHandler.ReadJsonWebToken(authToken);
                     var userId = read.Claims.FirstOrDefault(m => m.Type.Equals("nameid", StringComparison.InvariantCultureIgnoreCase))?.Value;
                     if (!string.IsNullOrWhiteSpace(appuser_id))
                     {
@@ -114,6 +121,6 @@ public class AppSessionContextRepository : IAppSessionContextRepository
 
 public interface IAppSessionContextRepository
 {
-    AppSessionData<AppUserIdentity> GetUserDataFromSession();
+    AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true);
     void ClearCurrentUserDataFromSession();
 }
