@@ -91,7 +91,9 @@ public class TokenService
                     IssuerSigningKey = new SymmetricSecurityKey(key),
                     ValidateIssuer = false,
                     ValidateAudience = false,
-                    ClockSkew = TimeSpan.Zero
+                    ClockSkew = TimeSpan.Zero,
+                    ValidateLifetime = true,
+                    RequireExpirationTime = true
                 }).Result;
 
                 if (result.IsValid && result.SecurityToken is JsonWebToken jwtoken)
@@ -118,7 +120,7 @@ public class TokenService
                             Id = Convert.ToInt32(tokenValues[ClaimTypes.Sid]),
                             ExpiresAt = jwtoken.ValidTo
                         };
-                        string userRoles = tokenValues["role"];
+                        string userRoles = tokenValues[ClaimTypes.Role];
                         AppUserIdentity.Roles = !string.IsNullOrWhiteSpace(userRoles) ? userRoles.Split(',').ToList<string>() : new List<string>();
                         objResp = GenResponse<AppUserIdentity>.Success(AppUserIdentity);
                         #region Sliding Expiration 

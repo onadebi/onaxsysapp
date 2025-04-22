@@ -204,6 +204,10 @@ public static class ServiceExtensions
                 IssuerSigningKey = new SymmetricSecurityKey(key),
                 ValidateIssuer = false,
                 ValidateAudience = false,
+                // Add explicit token lifetime validation
+                ValidateLifetime = true,                     // Enable expiration time validation
+                //ClockSkew = TimeSpan.Zero,                   // Remove default 5-minute tolerance
+                RequireExpirationTime = true                 // Ensure token has expiration claim
             };
 
             #region Allow for cookies authentication
@@ -228,7 +232,22 @@ public static class ServiceExtensions
                 },
                 OnTokenValidated = context =>
                 {
-                    // Token is valid, you can perform additional validation here if needed
+                    // Perform additional validation for the token expiration
+                    var jwtToken = context.SecurityToken as JsonWebToken;
+                    if (jwtToken == null)
+                    {
+                        context.Fail("Invalid JWT token format");
+                        return Task.CompletedTask;
+                    }
+
+                    // Double-check expiration time
+                    var utcNow = DateTime.UtcNow;
+                    if (jwtToken.ValidTo < utcNow)
+                    {
+                        context.Fail(new SecurityTokenExpiredException("Token has expired"));
+                        return Task.CompletedTask;
+                    }
+
                     return Task.CompletedTask;
                 },
                 OnAuthenticationFailed = context =>
