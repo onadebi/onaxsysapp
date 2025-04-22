@@ -306,7 +306,7 @@ public class UserProfileService : IUserProfileService
                         Email = userDetail.Email,
                         FirstName = userDetail.FirstName,
                         LastName = userDetail.LastName,
-                        Roles = userDetail.UserProfileUserApps.Count > 0 ? [.. userDetail.UserProfileUserApps.FirstOrDefault()?.UserRole] : ["user"],
+                        Roles = userDetail.UserProfileUserApps.Count > 0 ? [.. userDetail.UserProfileUserApps.FirstOrDefault()!.UserRole] : ["user"],
                         Guid = userDetail.Guid,
                         Id = userDetail.Id,
                         Picture = userDetail.UserProfileImage
