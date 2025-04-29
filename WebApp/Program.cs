@@ -18,6 +18,7 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 #region CUSTOM SERVICES AND DI
 builder.Services.AddCustomServiceCollections(builder);
+builder.Services.AddOpenTelemetryExtension(builder);
 #endregion
 
 var app = builder.Build();
