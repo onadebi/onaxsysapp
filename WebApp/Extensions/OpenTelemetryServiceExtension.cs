@@ -13,7 +13,7 @@ public static class OpenTelemetryServiceExtension
     public static IServiceCollection AddOpenTelemetryExtension(this IServiceCollection services, WebApplicationBuilder builder)
     {
         var config = builder.Configuration;
-        var serviceName = config["OpenTelemetry:ServiceName"] ?? "WebApp";
+        var serviceName = config["OpenTelemetry:ServiceName"] ?? "onaxapp-base";
         var serviceVersion = config["OpenTelemetry:ServiceVersion"] ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
         var connectionString = Environment.GetEnvironmentVariable("AppInsights", EnvironmentVariableTarget.Process) ?? config["OpenTelemetry:ConnectionString"];
 
@@ -65,10 +65,10 @@ public static class OpenTelemetryServiceExtension
                 // Check if EntityFrameworkCore instrumentation package is available
                 try
                 {
-                    //tracerProviderBuilder.AddEntityFrameworkCoreInstrumentation(options =>
-                    //{
-                    //    options.SetDbStatementForText = true;
-                    //});
+                    tracerProviderBuilder.AddEntityFrameworkCoreInstrumentation(options =>
+                    {
+                        options.SetDbStatementForText = true;
+                    });
                 }
                 catch (Exception ex)
                 {
