@@ -60,6 +60,9 @@ app.UseRouting();
 
 app.UseCors("DefaultCorsPolicy");
 
+// Configure middleware pipeline
+app.UseGlobalExceptionTelemetry();
+
 app.UseAuthentication();
 app.UseAuthorization();
 
