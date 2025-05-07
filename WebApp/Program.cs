@@ -8,6 +8,7 @@ using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddOpenTelemetryExtension(builder);
 // Add services to the container.
 builder.Services.AddControllersWithViews(opt =>
 {
@@ -18,7 +19,6 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 #region CUSTOM SERVICES AND DI
 builder.Services.AddCustomServiceCollections(builder);
-builder.Services.AddOpenTelemetryExtension(builder);
 #endregion
 
 var app = builder.Build();

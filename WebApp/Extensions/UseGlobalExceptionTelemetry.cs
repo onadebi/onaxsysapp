@@ -34,6 +34,7 @@ public static class GlobalExceptionTelemetryExtension
 
                         // Add detailed information about the exception
                         //activity.SetStatus(Status.Error.WithDescription(exception.Message));
+                        activity.DisplayName = exception.Message;
                         activity.SetTag("exception.type", exception.GetType().FullName);
                         activity.SetTag("exception.message", exception.Message);
                         activity.SetTag("exception.stacktrace", exception.StackTrace);
