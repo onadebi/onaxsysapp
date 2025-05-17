@@ -2,7 +2,7 @@ name: Build and deploy .NET core to Web App
 
 trigger:
     branches:
-      incluse: 
+      include: 
       - main
       # - dev
       - hotfix/*
