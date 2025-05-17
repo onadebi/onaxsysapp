@@ -71,13 +71,13 @@ stages:
         sudo npm install -g npm@latest && \
         sudo apt-get clean && \
         sudo rm -rf /var/lib/apt/lists/*
-      displayName: 'Install Node for MVC TailwindCSS NodeJS dependencies'
+      displayName: 'Install Node for MVC TailwindCSS NodeJS dependencies'    
     - script: |
         echo "==========Running Tests============"
         ls -l
         dotnet test --no-build
       workingDirectory: $(WORKING_DIRECTORY)/AppTest
-      displayName: 'Test'
+      displayName: 'Test'    
     - script: |
         echo "==========Building Server App============"
         node --version
@@ -88,19 +88,19 @@ stages:
         dotnet build --configuration $(CONFIGURATION) --no-restore
       workingDirectory: $(WORKING_DIRECTORY_SERVER)
       displayName: 'Build Server App'
-    # Uncomment and adjust the following for publishing to Azure Web App
-    # - script: |
-    #     set -e
-    #     dotnet publish $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-build --output $(AZURE_WEBAPP_PACKAGE_PATH)
-    #     echo "==========Verify Frontend Migration to build output============"
-    #     ls -l $(AZURE_WEBAPP_PACKAGE_PATH)/wwwroot
-    #   displayName: 'Publish'
-    # - task: PublishBuildArtifacts@1
-    #   inputs:
-    #     PathtoPublish: '$(AZURE_WEBAPP_PACKAGE_PATH)'
-    #     ArtifactName: 'webapp'
-    #     publishLocation: 'Container'
-    #   displayName: 'Publish Artifacts'
+    # Publishing to Azure Web App
+    - script: |
+        set -e
+        dotnet publish $(WORKING_DIRECTORY) --configuration $(CONFIGURATION) --no-build --output $(AZURE_WEBAPP_PACKAGE_PATH)
+        echo "==========Verify Frontend Migration to build output============"
+        ls -l $(AZURE_WEBAPP_PACKAGE_PATH)/wwwroot
+      displayName: 'Publish'
+    - task: PublishBuildArtifacts@1
+      inputs:
+        PathtoPublish: '$(AZURE_WEBAPP_PACKAGE_PATH)'
+        ArtifactName: 'webapp'
+        publishLocation: 'Container'
+      displayName: 'Publish Artifacts'
     # Add Docker build/push steps as needed for main branch
 
 - stage: DeployToServer
