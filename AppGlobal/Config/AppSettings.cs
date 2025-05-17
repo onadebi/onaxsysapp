@@ -12,6 +12,7 @@ public class AppSettings
     public MessageBroker? MessageBroker { get; set; }
     public AzureBlobConfig AzureBlobConfig { get; set; } = default!;
     public required ExternalAPIs ExternalAPIs { get; set; }
+    public AzKeyVault AzKeyVault { get; set; }
     public required SessionConfig SessionConfig { get; set; }
     public SpeechSynthesis SpeechSynthesis { get; set; } = default!;
     public required Prompts Prompts { get; set; }
@@ -23,6 +24,14 @@ public class ExternalAPIs
     public required GeminiApi GeminiApi { get; set; }
     public required YoutubeApi YoutubeApi { get; set; }
     public required GoogleOAuth GoogleOAuth { get; set; }
+}
+
+public class AzKeyVault
+{
+    public string KeyVaultUrl { get; set; } = string.Empty;
+    public string ClientId { get; set; } = string.Empty;
+    public string ClientSecret { get; set; } = string.Empty;
+    public string TenantId { get; set; } = string.Empty;
 }
 public class Prompts
 {

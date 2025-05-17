@@ -26,6 +26,7 @@ using AppCore.Services.Helpers;
 using Microsoft.Extensions.Primitives;
 using AppCore.Services.Common;
 using WebApp.Hubs;
+using Azure.Identity;
 
 namespace WebApp.Extensions;
 
@@ -33,10 +34,22 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddCustomServiceCollections(this IServiceCollection services, WebApplicationBuilder builder)
     {
+        string AzKeyVaultClientSecret = Environment.GetEnvironmentVariable("AzKeyVaultClientSecret", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string AzKeyVaultKeyVaultUrl = Environment.GetEnvironmentVariable("AzKeyVaultKeyVaultUrl", EnvironmentVariableTarget.Process) ?? string.Empty;
+
+        builder.Configuration.AddAzureKeyVault(
+            new Uri(AzKeyVaultKeyVaultUrl),
+            new ClientSecretCredential(
+                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:TenantId")!,
+                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ClientId")!,
+                AzKeyVaultClientSecret
+            )
+        );
+
         string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKeyEnvVar", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
         string RedisConfig = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("RedisConstring") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("RedisConstring")!;
         string MongoDbCon = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("MongoDbConnect") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("MongoDbConnect")!;
-        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? "Server=localhost;Port=5432;Database=onaxsys;Timeout=120;User Id=postgres;Password=onadebi;";
+        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("DBConString")!;
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
         string BlobStorageConstring = Environment.GetEnvironmentVariable("BlobStorageConstring", EnvironmentVariableTarget.Process) ?? string.Empty;
@@ -65,7 +78,7 @@ public static class ServiceExtensions
             options.SpeechSynthesis.SpeechEndpoint = Environment.GetEnvironmentVariable("SpeechEndpoint", EnvironmentVariableTarget.Process) ?? string.Empty;
             options.SpeechSynthesis.SpeechLocation = Environment.GetEnvironmentVariable("SpeechLocation", EnvironmentVariableTarget.Process) ?? string.Empty;
             #endregion
-        });
+        });        
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
         services.AddSingleton<ISqlDataAccess>((svcProvider) => Factories<SqlDataAccess>.SqlDataAccessService(serviceProvider: svcProvider, conString: dbConstring));
