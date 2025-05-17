@@ -1,16 +1,16 @@
 trigger:
     branches:
       include: 
-      - main
-      # - dev
-      - hotfix/*
+        - main
+        # - dev
+        - hotfix/*
 
 pool:
   vmImage: 'ubuntu-latest'
 
 variables:
     APP_WEBAPP_NAME: 'onaxapp'
-    AZURE_WEBAPP_PACKAGE_PATH:' Onaxapp/publish'
+    AZURE_WEBAPP_PACKAGE_PATH: 'Onaxapp/publish'
     CONFIGURATION: 'Release'
     DOTNET_CORE_VERSION: '9.0.x'
     WORKING_DIRECTORY: '.'
