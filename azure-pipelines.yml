@@ -102,3 +102,30 @@ stages:
     #     publishLocation: 'Container'
     #   displayName: 'Publish Artifacts'
     # Add Docker build/push steps as needed for main branch
+
+- stage: DeployToServer
+  dependsOn: TestAndBuildApp
+  jobs:
+  - job: deploy_to_server
+    steps:
+    - checkout: none
+
+    # Download the published artifact from previous stage
+    - task: DownloadBuildArtifacts@0
+      inputs:
+        buildType: 'current'
+        downloadType: 'single'
+        artifactName: 'webapp'
+        downloadPath: '$(Pipeline.Workspace)/webapp'
+      displayName: 'Download Published Artifact'
+
+    # Copy files to the remote server using SSH
+    - task: CopyFilesOverSSH@0
+      inputs:
+        sshEndpoint: 'onax-me-ssh-service-connection'
+        sourceFolder: '$(Pipeline.Workspace)/webapp'
+        contents: '**/*'
+        targetFolder: '/var/www/onaxappcore'
+        cleanTargetFolder: false
+        overwrite: true
+      displayName: 'Copy files to /var/www/onaxappcore on remote server'
