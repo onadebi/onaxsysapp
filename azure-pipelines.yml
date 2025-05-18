@@ -111,20 +111,20 @@ stages:
 
     # Download the published artifact from previous stage
     - task: DownloadBuildArtifacts@0
+      displayName: 'Download Published Artifact'
       inputs:
         buildType: 'current'
         downloadType: 'single'
         artifactName: 'webapp'
         downloadPath: '$(Pipeline.Workspace)/webapp'
-      displayName: 'Download Published Artifact'
 
     # Copy files to the remote server using SSH
     - task: CopyFilesOverSSH@0
+      displayName: 'Copy files to /var/www/onaxappcore on remote server'
       inputs:
         sshEndpoint: 'onax-me-ssh-service-connection'
-        sourceFolder: '$(Pipeline.Workspace)/webapp/'
+        sourceFolder: '$(Pipeline.Workspace)/webapp/webapp/'
         contents: '**/*'
         targetFolder: '/var/www/onaxappcore'
         cleanTargetFolder: false
         overwrite: true
-      displayName: 'Copy files to /var/www/onaxappcore on remote server'
