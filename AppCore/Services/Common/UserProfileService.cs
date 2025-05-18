@@ -330,7 +330,7 @@ public class UserProfileService : IUserProfileService
     public async Task<GenResponse<GoogleOAuthResponse>> VerfiyGoogleAuth(string token)
     {
         GenResponse<GoogleOAuthResponse> objResp = new();
-        string clientId = Environment.GetEnvironmentVariable(_appSettings.ExternalAPIs.GoogleOAuth.ClientId, EnvironmentVariableTarget.Process) ?? "";
+        string clientId = _appSettings.ExternalAPIs.GoogleOAuth.ClientId ?? "";
         try
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings { Audience = [clientId] };

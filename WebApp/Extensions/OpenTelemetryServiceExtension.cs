@@ -1,4 +1,5 @@
-﻿using Azure.Monitor.OpenTelemetry.Exporter;
+﻿using Azure.Identity;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
@@ -12,10 +13,26 @@ public static class OpenTelemetryServiceExtension
     public static readonly ActivitySource AppActivitySource = new("AppGlobal");
     public static IServiceCollection AddOpenTelemetryExtension(this IServiceCollection services, WebApplicationBuilder builder)
     {
+        string AzKeyVaultClientSecret = Environment.GetEnvironmentVariable("AzKeyVaultClientSecret", EnvironmentVariableTarget.Process)!;
+        string AzKeyVaultKeyVaultUrl = Environment.GetEnvironmentVariable("AzKeyVaultKeyVaultUrl", EnvironmentVariableTarget.Process)!;
+
+        builder.Configuration.AddAzureKeyVault(
+            new Uri(AzKeyVaultKeyVaultUrl),
+            new ClientSecretCredential(
+                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:TenantId")!,
+                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ClientId")!,
+                AzKeyVaultClientSecret
+            )
+        );
+
         var config = builder.Configuration;
-        var serviceName = config["OpenTelemetry:ServiceName"] ?? "onaxapp-base";
-        var serviceVersion = config["OpenTelemetry:ServiceVersion"] ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
-        var connectionString = Environment.GetEnvironmentVariable("AppInsights", EnvironmentVariableTarget.Process) ?? config["OpenTelemetry:ConnectionString"];
+        var serviceName = config.GetValue<string>("OpenTelemetry:ServiceName") ?? "onaxapp-base";
+        var serviceVersion = config.GetValue<string>("OpenTelemetry:ServiceVersion") ?? Assembly.GetExecutingAssembly().GetName().Version?.ToString() ?? "1.0.0";
+        var connectionString = Environment.GetEnvironmentVariable("AppInsights", EnvironmentVariableTarget.Process);
+        if(string.IsNullOrWhiteSpace(connectionString))
+        {
+            connectionString = config.GetValue<string>("OpenTelemetry:ConnectionString");
+        } 
 
         // Add OpenTelemetry services
         services.AddOpenTelemetry()

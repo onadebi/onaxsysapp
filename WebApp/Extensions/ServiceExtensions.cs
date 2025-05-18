@@ -34,8 +34,8 @@ public static class ServiceExtensions
 {
     public static IServiceCollection AddCustomServiceCollections(this IServiceCollection services, WebApplicationBuilder builder)
     {
-        string AzKeyVaultClientSecret = Environment.GetEnvironmentVariable("AzKeyVaultClientSecret", EnvironmentVariableTarget.Process) ?? string.Empty;
-        string AzKeyVaultKeyVaultUrl = Environment.GetEnvironmentVariable("AzKeyVaultKeyVaultUrl", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string AzKeyVaultClientSecret = Environment.GetEnvironmentVariable("AzKeyVaultClientSecret", EnvironmentVariableTarget.Process)!;
+        string AzKeyVaultKeyVaultUrl = Environment.GetEnvironmentVariable("AzKeyVaultKeyVaultUrl", EnvironmentVariableTarget.Process)!;
 
         builder.Configuration.AddAzureKeyVault(
             new Uri(AzKeyVaultKeyVaultUrl),
@@ -52,19 +52,20 @@ public static class ServiceExtensions
         string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("DBConString")!;
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
-        string BlobStorageConstring = Environment.GetEnvironmentVariable("BlobStorageConstring", EnvironmentVariableTarget.Process) ?? string.Empty;
-        string BlobReadAccessYear2099 = Environment.GetEnvironmentVariable("BlobReadAccessYear2099", EnvironmentVariableTarget.Process) ?? string.Empty;
-        string BlobStoragePath = Environment.GetEnvironmentVariable("BlobStoragePath", EnvironmentVariableTarget.Process) ?? string.Empty;
-        string YoutubeApiKeyEnv = Environment.GetEnvironmentVariable("YoutubeApiKeyEnv", EnvironmentVariableTarget.Process) ?? string.Empty;
-        string GeminiApiKey = Environment.GetEnvironmentVariable("GeminiApiKeyEnv", EnvironmentVariableTarget.Process) ?? string.Empty;
+        string BlobStorageConstring = Environment.GetEnvironmentVariable("BlobStorageConstring", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("BlobStorageConstring")!;
+        string BlobReadAccessYear2099 = Environment.GetEnvironmentVariable("BlobReadAccessYear2099", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("BlobReadAccessYear2099")!;
+        string BlobStoragePath = Environment.GetEnvironmentVariable("BlobStoragePath", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("BlobStoragePath")!;
+        string YoutubeApiKeyEnv = Environment.GetEnvironmentVariable("YoutubeApiKeyEnv", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("YoutubeApiKeyEnv")!;
+        string GeminiApiKey = Environment.GetEnvironmentVariable("GeminiApiKeyEnv", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("GeminiApiKeyEnv")!;
 
         services.Configure<AppSettings>(builder.Configuration.GetSection(nameof(AppSettings)));
         services.Configure<ScriptsConfig>(builder.Configuration.GetSection(nameof(ScriptsConfig)));
         services.Configure<SessionConfig>(builder.Configuration.GetSection(nameof(SessionConfig)));
         services.Configure<EmailConfig>(builder.Configuration.GetSection(nameof(EmailConfig)));
 
-        // Globally postmodify the property values of certain fields in AppSettings to read from environment variables
-        builder.Services.PostConfigure<AppSettings>(options =>
+
+    // Globally postmodify the property values of certain fields in AppSettings to read from environment variables
+    builder.Services.PostConfigure<AppSettings>(options =>
         {
             options.AzureBlobConfig.BlobStorageConstring = BlobStorageConstring;
             options.AzureBlobConfig.BlobReadAccessYear2099 = BlobReadAccessYear2099;
@@ -73,12 +74,19 @@ public static class ServiceExtensions
             options.ExternalAPIs.YoutubeApi.YoutubeApiKey = YoutubeApiKeyEnv;
             options.StartUpAssemblyName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name ??  builder.Environment.ApplicationName;
 
+
+            options.ExternalAPIs.GoogleOAuth.ClientId = Environment.GetEnvironmentVariable("GoogleOAuthClientId", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("GoogleOAuthClientId")!; 
+
             #region SpeechSynthesis
-            options.SpeechSynthesis.SpeechKey = Environment.GetEnvironmentVariable("SpeechKey", EnvironmentVariableTarget.Process) ?? string.Empty;
-            options.SpeechSynthesis.SpeechEndpoint = Environment.GetEnvironmentVariable("SpeechEndpoint", EnvironmentVariableTarget.Process) ?? string.Empty;
-            options.SpeechSynthesis.SpeechLocation = Environment.GetEnvironmentVariable("SpeechLocation", EnvironmentVariableTarget.Process) ?? string.Empty;
+            options.SpeechSynthesis.SpeechKey = Environment.GetEnvironmentVariable("SpeechKey", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("SpeechKey")!;
+            options.SpeechSynthesis.SpeechEndpoint = Environment.GetEnvironmentVariable("SpeechEndpoint", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("SpeechEndpoint")!;
+            options.SpeechSynthesis.SpeechLocation = Environment.GetEnvironmentVariable("SpeechLocation", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("SpeechLocation")!;
             #endregion
-        });        
+        });
+
+        // Register a singleton AppSettings that can be resolved directly
+        AppSettings configuredAppSettings = builder.Services.BuildServiceProvider().GetRequiredService<IOptions<AppSettings>>().Value;
+        //services.AddSingleton(configuredAppSettings);
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
         services.AddSingleton<ISqlDataAccess>((svcProvider) => Factories<SqlDataAccess>.SqlDataAccessService(serviceProvider: svcProvider, conString: dbConstring));
