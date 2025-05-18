@@ -122,7 +122,7 @@ stages:
     - task: CopyFilesOverSSH@0
       inputs:
         sshEndpoint: 'onax-me-ssh-service-connection'
-        sourceFolder: '$(Pipeline.Workspace)/webapp'
+        sourceFolder: '$(Pipeline.Workspace)/webapp/'
         contents: '**/*'
         targetFolder: '/var/www/onaxappcore'
         cleanTargetFolder: false
