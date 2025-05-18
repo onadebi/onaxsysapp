@@ -29,9 +29,8 @@ variables:
     value: './WebApp'
   - name: ONAX_ENV_VARS
     value: 'onax-env-vars.sh'
+  # Import variable group from Azure DevOps Library
   - group: OnaxAppCore
-  - name: AzKeyVaultKeyVaultUrl
-  - name: AzKeyVaultClientSecret
 
 stages:
 - stage: FrontendEnvDependencies
@@ -116,35 +115,78 @@ stages:
     # Add Docker build/push steps as needed for main branch
 
 - stage: SetRemoteEnvVars
-  dependsOn: TestAndBuildApp
+  # dependsOn: TestAndBuildApp
   jobs:
   - job: set_remote_env_vars
     steps:
     - checkout: none
+    
+    # Debug step to verify variable values (without showing secrets)
+    - task: Bash@3
+      displayName: 'Debug - Verify variable values'
+      inputs:
+        targetType: 'inline'
+        script: |
+          echo "Debug: Checking variable values"
+          echo "AzKeyVaultKeyVaultUrl exists: $([[ ! -z "$(AzKeyVaultKeyVaultUrl)" ]] && echo 'YES' || echo 'NO')"
+          echo "AzKeyVaultClientSecret exists: $([[ ! -z "$(AzKeyVaultClientSecret)" ]] && echo 'YES' || echo 'NO')"
+          echo "ONAX_ENV_VARS value: $(ONAX_ENV_VARS)"# Create script with environment variables for the remote server
+    - task: Bash@3
+      displayName: 'Prepare environment variables script'
+      inputs:
+        targetType: 'inline'
+        script: |
+          # Create a temporary script with the environment variables
+          echo "#!/bin/bash" > $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "# Auto-generated environment variables script" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "sudo touch /etc/profile.d/$(ONAX_ENV_VARS)" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          
+          # Add each environment variable to the script
+          echo "if ! grep -q \"AzKeyVaultKeyVaultUrl\" /etc/profile.d/$(ONAX_ENV_VARS); then" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "  echo 'export AzKeyVaultKeyVaultUrl=\"$(AzKeyVaultKeyVaultUrl)\"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "fi" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          
+          echo "if ! grep -q \"AzKeyVaultClientSecret\" /etc/profile.d/$(ONAX_ENV_VARS); then" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "  echo 'export AzKeyVaultClientSecret=\"$(AzKeyVaultClientSecret)\"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "fi" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          
+          # Make the script executable
+          chmod +x $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          
+          # Output the script content for debugging (without secrets)
+          echo "Generated environment variables script:"
+          grep -v "Secret" $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+    
+    # Copy the environment variables script to the remote server
+    - task: CopyFilesOverSSH@0
+      displayName: 'Copy environment variables script to server'
+      inputs:
+        sshEndpoint: 'onax-me-ssh-service-connection'
+        sourceFolder: '$(Build.ArtifactStagingDirectory)'
+        contents: 'env_vars_setup.sh'
+        targetFolder: '/tmp'
+        overwrite: true
+        
+    # Execute the script on the remote server
     - task: SSH@0
       displayName: 'Set environment variables on remote Ubuntu server'
       inputs:
         sshEndpoint: 'onax-me-ssh-service-connection'
         runOptions: 'inline'
         inline: |
-          # Create environment variables file if it doesn't exist
-          sudo touch /etc/profile.d/$(ONAX_ENV_VARS)
-          
-          # Check if variables already exist in the file
-          if ! grep -q "AzKeyVaultKeyVaultUrl" /etc/profile.d/$(ONAX_ENV_VARS); then
-            echo 'export AzKeyVaultKeyVaultUrl="$(AzKeyVaultKeyVaultUrl)"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)
-          fi
-          
-          if ! grep -q "AzKeyVaultClientSecret" /etc/profile.d/$(ONAX_ENV_VARS); then
-            echo 'export AzKeyVaultClientSecret="$(AzKeyVaultClientSecret)"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)
-          fi
-          
-          # Ensure the file is executable
+          # Make the script executable and run it
+          sudo chmod +x /tmp/env_vars_setup.sh
+          sudo /tmp/env_vars_setup.sh
+            # Ensure the file is executable and has correct permissions
           sudo chmod +x /etc/profile.d/$(ONAX_ENV_VARS)
+          sudo chmod 644 /etc/profile.d/$(ONAX_ENV_VARS)
           
           # Verify that the variables are set
           echo "Environment variables have been set:"
           grep -v "Secret" /etc/profile.d/$(ONAX_ENV_VARS)
+          
+          # Clean up
+          sudo rm -f /tmp/env_vars_setup.sh
         readyTimeout: '20000'
 
 - stage: DeployToServer
