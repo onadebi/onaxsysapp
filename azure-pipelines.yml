@@ -9,16 +9,29 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-    APP_WEBAPP_NAME: 'onaxapp'
-    AZURE_WEBAPP_PACKAGE_PATH: 'Onaxapp/publish'
-    CONFIGURATION: 'Release'
-    DOTNET_CORE_VERSION: '9.0.x'
-    WORKING_DIRECTORY: '.'
-    WORKING_DIRECTORY_UI: 'clientapp'
-    PUBLISH_PATH_UI: 'WebApp/wwwroot/portal'
-    PUBLISHED_APP_PATH: 'WebApp/dist'
-    WORKING_DIRECTORY_SERVER: './WebApp'
-
+  - name: APP_WEBAPP_NAME
+    value: 'onaxapp'
+  - name: AZURE_WEBAPP_PACKAGE_PATH
+    value: 'Onaxapp/publish'
+  - name: CONFIGURATION
+    value: 'Release'
+  - name: DOTNET_CORE_VERSION
+    value: '9.0.x'
+  - name: WORKING_DIRECTORY
+    value: '.'
+  - name: WORKING_DIRECTORY_UI
+    value: 'clientapp'
+  - name: PUBLISH_PATH_UI
+    value: 'WebApp/wwwroot/portal'
+  - name: PUBLISHED_APP_PATH
+    value: 'WebApp/dist'
+  - name: WORKING_DIRECTORY_SERVER
+    value: './WebApp'
+  - name: ONAX_ENV_VARS
+    value: 'onax-env-vars.sh'
+  - group: OnaxAppCore
+  - name: AzKeyVaultKeyVaultUrl
+  - name: AzKeyVaultClientSecret
 
 stages:
 - stage: FrontendEnvDependencies
@@ -102,8 +115,40 @@ stages:
       displayName: 'Publish Artifacts'
     # Add Docker build/push steps as needed for main branch
 
-- stage: DeployToServer
+- stage: SetRemoteEnvVars
   dependsOn: TestAndBuildApp
+  jobs:
+  - job: set_remote_env_vars
+    steps:
+    - checkout: none
+    - task: SSH@0
+      displayName: 'Set environment variables on remote Ubuntu server'
+      inputs:
+        sshEndpoint: 'onax-me-ssh-service-connection'
+        runOptions: 'commands'
+        commands: |
+          # Create environment variables file if it doesn't exist
+          sudo touch /etc/profile.d/$(ONAX_ENV_VARS)
+          
+          # Check if variables already exist in the file
+          if ! grep -q "AzKeyVaultKeyVaultUrl" /etc/profile.d/$(ONAX_ENV_VARS); then
+            echo 'export AzKeyVaultKeyVaultUrl="$(AzKeyVaultKeyVaultUrl)"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)
+          fi
+          
+          if ! grep -q "AzKeyVaultClientSecret" /etc/profile.d/$(ONAX_ENV_VARS); then
+            echo 'export AzKeyVaultClientSecret="$(AzKeyVaultClientSecret)"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)
+          fi
+          
+          # Ensure the file is executable
+          sudo chmod +x /etc/profile.d/$(ONAX_ENV_VARS)
+          
+          # Verify that the variables are set
+          echo "Environment variables have been set:"
+          grep -v "Secret" /etc/profile.d/$(ONAX_ENV_VARS)
+        readyTimeout: '20000'
+
+- stage: DeployToServer
+  dependsOn: SetRemoteEnvVars
   jobs:
   - job: deploy_to_server
     steps:
