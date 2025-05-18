@@ -125,8 +125,8 @@ stages:
       displayName: 'Set environment variables on remote Ubuntu server'
       inputs:
         sshEndpoint: 'onax-me-ssh-service-connection'
-        runOptions: 'commands'
-        commands: |
+        runOptions: 'inline'
+        inline: |
           # Create environment variables file if it doesn't exist
           sudo touch /etc/profile.d/$(ONAX_ENV_VARS)
           
