@@ -215,3 +215,46 @@ stages:
         targetFolder: '/var/www/onaxappcore'
         cleanTargetFolder: false
         overwrite: true
+        
+    # [Can be made optional or moved to seperate pipeline file]
+    #   -- Explicitly set up logs directory with proper permissions
+    - task: SSH@0
+      displayName: 'Create logs directory with proper permissions'
+      inputs:
+        sshEndpoint: 'onax-me-ssh-service-connection'
+        runOptions: 'inline'
+        inline: |
+          # Create logs directory with wide-open permissions to ensure app can write to it
+          echo "Setting up logs directory with proper permissions..."
+          sudo mkdir -p /var/www/onaxappcore/logs
+          
+          # Find the process user running the application
+          PROCESS_USER=$(ps aux | grep -E 'dotnet.*onaxapp|kestrel.*onaxapp' | grep -v grep | head -1 | awk '{print $1}')
+          
+          if [ -z "$PROCESS_USER" ]; then
+            # If process user not found, try to find the application's systemd service
+            if [ -f /etc/systemd/system/onaxappcore.service ]; then
+              PROCESS_USER=$(grep "User=" /etc/systemd/system/onaxappcore.service | cut -d= -f2)
+              echo "Found systemd service user: $PROCESS_USER"
+            elif [ -f /etc/systemd/system/kestrel-onaxappcore.service ]; then
+              PROCESS_USER=$(grep "User=" /etc/systemd/system/kestrel-onaxappcore.service | cut -d= -f2)
+              echo "Found kestrel service user: $PROCESS_USER"
+            else
+              # Default to www-data if we can't determine
+              PROCESS_USER="www-data"
+              echo "Using default www-data user"
+            fi
+          else
+            echo "Found process running as user: $PROCESS_USER"
+          fi
+          
+          # Give ownership to the process user
+          sudo chown -R $PROCESS_USER:$PROCESS_USER /var/www/onaxappcore/logs
+          
+          # Set very permissive permissions to ensure no permission issues
+          sudo chmod -R 777 /var/www/onaxappcore/logs
+          
+          # List the directory to confirm
+          ls -la /var/www/onaxappcore/logs
+          
+          echo "Logs directory permissions set successfully"
