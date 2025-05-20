@@ -1,4 +1,5 @@
 ﻿using AppGlobal.Config;
+using Microsoft.ApplicationInsights;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.JsonWebTokens;
@@ -13,10 +14,13 @@ namespace AppGlobal.Services;
 public class TokenService
 {
     private readonly string _encryptionKey;
+    private readonly TelemetryClient _telemetryClient;
     private readonly AppSettings _appSettings;
-    public TokenService(string EncryptionKey, IOptions<AppSettings> sessionConfig)
+
+    public TokenService(string EncryptionKey, IOptions<AppSettings> sessionConfig, TelemetryClient telemetryClient)
     {
         _encryptionKey = EncryptionKey;
+        _telemetryClient = telemetryClient;
         _appSettings = sessionConfig.Value;
     }
 
@@ -33,13 +37,15 @@ public class TokenService
                 new Claim(ClaimTypes.Sid, $"{user.Id}"),
                 new Claim(ClaimTypes.Role, System.Text.Json.JsonSerializer.Serialize(user.Roles), JsonClaimValueTypes.JsonArray)
             };
+        #region May not be needed
         //if (user.Roles != null && user.Roles.Count >= 0)
         //{
         //    claims.Add(new Claim(ClaimTypes.Role, System.Text.Json.JsonSerializer.Serialize(user.Roles), JsonClaimValueTypes.JsonArray));
         //}
+        #endregion
         byte[] keBytes = System.Text.Encoding.UTF8.GetBytes(_encryptionKey);
         int keyLength = _encryptionKey.Length;
-        OnaxTools.Logger.LogInfo($"the length of encryption key is [{keyLength}]");
+        _telemetryClient.TrackTrace($"The length of encryption key is [{keyLength}]");
         var key = new SymmetricSecurityKey(keBytes);
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -57,7 +63,7 @@ public class TokenService
         }
         catch (Exception ex)
         {
-            OnaxTools.Logger.LogException(ex, $"[TokenService][{nameof(CreateAppToken)}]");
+            _telemetryClient.TrackException(ex);
         }
         userClaims = claims;
         return objResp;

@@ -27,6 +27,7 @@ using Microsoft.Extensions.Primitives;
 using AppCore.Services.Common;
 using WebApp.Hubs;
 using Azure.Identity;
+using Microsoft.ApplicationInsights;
 
 namespace WebApp.Extensions;
 
@@ -90,10 +91,13 @@ public static class ServiceExtensions
 
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
         services.AddSingleton<ISqlDataAccess>((svcProvider) => Factories<SqlDataAccess>.SqlDataAccessService(serviceProvider: svcProvider, conString: dbConstring));
+
+        builder.Services.AddApplicationInsightsTelemetry();
         services.AddScoped<TokenService>((svcProvider) =>
         {
+            TelemetryClient _telemetry = svcProvider.GetRequiredService<TelemetryClient>();
             var _appsettingsConfig = svcProvider.GetRequiredService<IOptions<AppSettings>>();
-            return new TokenService(encryptionKey, _appsettingsConfig);
+            return new TokenService(encryptionKey, _appsettingsConfig,_telemetry);
         });
         services.AddSingleton<IMongoDataAccess>((svcProvider) => new MongoDataAccess(MongoDbCon, "onasonic"));
 
