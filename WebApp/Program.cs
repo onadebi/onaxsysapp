@@ -1,6 +1,7 @@
 using AppCore.Persistence.ModelBuilders;
 using Hangfire.Logging;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.FileProviders;
 using WebApp.Extensions;
@@ -77,6 +78,12 @@ app.UseStaticFiles(new StaticFileOptions
 });
 #endregion
 
+#region Enable forwarded headers
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+#endregion
 app.Use(async (context, next) =>
 {
     var req = context.Request;
