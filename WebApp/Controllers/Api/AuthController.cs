@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using OnaxTools.Dto.Http;
 using OnaxTools.Dto.Identity;
+using OnaxTools.Enums.Http;
 using System.Net;
 using System.Security.Claims;
 using TokenService = AppGlobal.Services.TokenService;
@@ -146,6 +147,7 @@ namespace WebApp.Controllers.Api
                 {
                     objResp.Error = objResp.Message = "Unable to generate token. Kindly retry";
                     objResp.IsSuccess = false;
+                    objResp.StatCode = (int)StatusCodeEnum.ServerError;
                     return objResp;
                 }
                 if (userClaims != null && userClaims.Count > 0)

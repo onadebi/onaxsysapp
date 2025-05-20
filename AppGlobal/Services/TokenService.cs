@@ -45,7 +45,8 @@ public class TokenService
         #endregion
         byte[] keBytes = System.Text.Encoding.UTF8.GetBytes(_encryptionKey);
         int keyLength = _encryptionKey.Length;
-        _telemetryClient.TrackTrace($"The length of encryption key is [{keyLength}]");
+        _telemetryClient.TrackEvent($"The length of encryption key is [{keyLength}]");
+        Console.WriteLine($"The length of encryption key is [{keyLength}]");
         var key = new SymmetricSecurityKey(keBytes);
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
@@ -63,6 +64,8 @@ public class TokenService
         }
         catch (Exception ex)
         {
+            Console.WriteLine("[CreateTokeError]:::::" + ex.Message);
+            _telemetryClient.TrackEvent("[CreateTokeError]:::::" + ex.Message);
             _telemetryClient.TrackException(ex);
         }
         userClaims = claims;
