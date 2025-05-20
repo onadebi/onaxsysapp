@@ -38,6 +38,8 @@ public class TokenService
         //    claims.Add(new Claim(ClaimTypes.Role, System.Text.Json.JsonSerializer.Serialize(user.Roles), JsonClaimValueTypes.JsonArray));
         //}
         byte[] keBytes = System.Text.Encoding.UTF8.GetBytes(_encryptionKey);
+        int keyLength = _encryptionKey.Length;
+        OnaxTools.Logger.LogInfo($"the length of encryption key is [{keyLength}]");
         var key = new SymmetricSecurityKey(keBytes);
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
