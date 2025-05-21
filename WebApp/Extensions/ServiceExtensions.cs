@@ -92,7 +92,10 @@ public static class ServiceExtensions
         //services.AddSingleton<ISqlDataAccess>(new SqlDataAccess(builder.Configuration.GetConnectionString("Default")));
         services.AddSingleton<ISqlDataAccess>((svcProvider) => Factories<SqlDataAccess>.SqlDataAccessService(serviceProvider: svcProvider, conString: dbConstring));
 
-        builder.Services.AddApplicationInsightsTelemetry();
+        builder.Services.AddApplicationInsightsTelemetry(options=>
+        {
+            options.ConnectionString = "InstrumentationKey=2ae43e38-843a-4270-b22b-3289515c7f45;IngestionEndpoint=https://canadacentral-1.in.applicationinsights.azure.com/;LiveEndpoint=https://canadacentral.livediagnostics.monitor.azure.com/;ApplicationId=ce18232c-399e-4fff-8791-eae405c9fa10";
+        });
         services.AddScoped<TokenService>((svcProvider) =>
         {
             TelemetryClient _telemetry = svcProvider.GetRequiredService<TelemetryClient>();
