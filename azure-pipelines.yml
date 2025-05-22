@@ -149,6 +149,10 @@ stages:
           echo "if ! grep -q \"AzKeyVaultClientSecret\" /etc/profile.d/$(ONAX_ENV_VARS); then" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
           echo "  echo 'export AzKeyVaultClientSecret=\"$(AzKeyVaultClientSecret)\"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
           echo "fi" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+
+          echo "if ! grep -q \"EncryptionKeyEnvVar\" /etc/profile.d/$(ONAX_ENV_VARS); then" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "  echo 'export EncryptionKeyEnvVar=\"$(EncryptionKeyEnvVar)\"' | sudo tee -a /etc/profile.d/$(ONAX_ENV_VARS)" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
+          echo "fi" >> $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
           
           # Make the script executable
           chmod +x $(Build.ArtifactStagingDirectory)/env_vars_setup.sh
