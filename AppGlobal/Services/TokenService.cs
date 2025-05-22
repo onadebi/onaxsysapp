@@ -45,8 +45,8 @@ public class TokenService
         #endregion
         byte[] keBytes = System.Text.Encoding.UTF8.GetBytes(_encryptionKey);
         int keyLength = _encryptionKey.Length;
-        _telemetryClient.TrackEvent($"TokenServiceTriggered", new Dictionary<string, string> { { "KeyLength", Convert.ToString(keyLength) } });
-        Console.WriteLine($"The length of encryption key is [{keyLength}]");
+        _telemetryClient.TrackEvent($"TokenServiceTriggered", new Dictionary<string, string> { { "KeyLength",_encryptionKey+ "["+ Convert.ToString(keyLength)+"]" } });
+        Console.WriteLine($"The length of encryption key {_encryptionKey} is [{keyLength}]");
         var key = new SymmetricSecurityKey(keBytes);
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
 
