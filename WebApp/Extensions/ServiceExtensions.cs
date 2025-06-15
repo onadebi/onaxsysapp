@@ -44,7 +44,11 @@ public static class ServiceExtensions
                 builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:TenantId")!,
                 builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ClientId")!,
                 AzKeyVaultClientSecret
-            )
+            ),
+            new Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions
+            {
+                ReloadInterval = TimeSpan.FromHours(48)// Optional: Reload secrets every 48 hours
+            }
         );
 
         string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKeyEnvVar", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
