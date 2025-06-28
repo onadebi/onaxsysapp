@@ -493,3 +493,4 @@ $RECYCLE.BIN/
 WebApp/Properties/launchSettings.json
 WebApp/Properties/launchSettings.json
 /WebApp/wwwroot/css/tailwindoutput.css
+/WebApp/appsettings.Development.json
