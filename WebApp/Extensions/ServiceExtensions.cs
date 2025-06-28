@@ -37,7 +37,7 @@ public static class ServiceExtensions
     {
         string AzKeyVaultClientSecret = Environment.GetEnvironmentVariable("AzKeyVaultClientSecret", EnvironmentVariableTarget.Process)!;
         string AzKeyVaultKeyVaultUrl = Environment.GetEnvironmentVariable("AzKeyVaultKeyVaultUrl", EnvironmentVariableTarget.Process)!;
-
+#if  DEBUG == false
         builder.Configuration.AddAzureKeyVault(
             new Uri(AzKeyVaultKeyVaultUrl),
             new ClientSecretCredential(
@@ -50,11 +50,11 @@ public static class ServiceExtensions
                 ReloadInterval = TimeSpan.FromHours(48)// Optional: Reload secrets every 48 hours
             }
         );
-
+#endif
         string encryptionKey = Environment.GetEnvironmentVariable("EncryptionKeyEnvVar", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:Encryption:Key")!;
         string RedisConfig = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("RedisConstring") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("RedisConstring")!;
         string MongoDbCon = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("MongoDbConnect") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("MongoDbConnect")!;
-        string dbConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetConnectionString("DBConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("DBConString")!;
+        string dbConstring = Environment.GetEnvironmentVariable("DBConString", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetConnectionString("DBConString")!;
         string rabbitMqConstring = Environment.GetEnvironmentVariable(builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString") ?? string.Empty, EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("AppSettings:MessageBroker:RabbitMq:ConString")!;
 
         string BlobStorageConstring = Environment.GetEnvironmentVariable("BlobStorageConstring", EnvironmentVariableTarget.Process) ?? builder.Configuration.GetValue<string>("BlobStorageConstring")!;

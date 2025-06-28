@@ -142,7 +142,7 @@ namespace WebApp.Controllers.Api
             if (objResp.IsSuccess && !String.IsNullOrWhiteSpace(objResp.Result.Email))
             {
                 AppUserIdentity userInfo = new() { DisplayName = $"{objResp.Result.FirstName} {objResp.Result.LastName}", Email = objResp.Result.Email, Guid = objResp.Result.Guid, Roles = [.. objResp.Result.Roles], Id = objResp.Result.Id };
-                objResp.Result.token = _tokenService.CreateAppToken(userInfo, out List<Claim> userClaims, 15 * 4 * 24);
+                objResp.Result.token = _tokenService.CreateAppToken(userInfo, out List<Claim> userClaims, 2);
                 if (objResp.Result.token == null)
                 {
                     objResp.Error = objResp.Message = "Unable to generate token. Kindly retry";

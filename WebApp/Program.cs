@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.FileProviders;
 using WebApp.Extensions;
+using WebApp.Helpers.Filters;
+using WebApp.Helpers.Middleware;
 using WebApp.Hubs;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -100,10 +102,12 @@ app.Use(async (context, next) =>
 
 app.MapHub<AppNotificationHub>("/notificationshub");
 
+app.UseMiddleware<AppSessionManager>();
+
 #region Hangfire dashboard
 app.UseHangfireDashboard("/hangfire", new Hangfire.DashboardOptions
 {
-    Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
+    Authorization = new[] { new HangfireDashboardAuthFilter() }
 });
 #endregion
 

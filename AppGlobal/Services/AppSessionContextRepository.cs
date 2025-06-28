@@ -23,7 +23,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
         this._sessionConfig = sessionConfig.Value;
     }
 
-    public AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true)
+    public AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true, bool refreshBeforeExpiry = false)
     {
         AppSessionData<AppUserIdentity> objResp = new();
         try
@@ -39,7 +39,7 @@ public class AppSessionContextRepository : IAppSessionContextRepository
                     cookieValue = _contextAccessor.HttpContext.Request.Headers.Authorization.FirstOrDefault(m => m != null && m.StartsWith("Bearer"))?.Split(" ")[1];
                 }
                 #region First get by claims
-                GenResponse<AppUserIdentity> userClaimsData = _tokenService.ValidateToken(_contextAccessor.HttpContext);
+                GenResponse<AppUserIdentity> userClaimsData = _tokenService.ValidateToken(_contextAccessor.HttpContext, refreshBeforeExpiry);
                 if (userClaimsData.IsSuccess && userClaimsData.Result != null)
                 {
                     objResp.Data = userClaimsData.Result;
@@ -121,6 +121,6 @@ public class AppSessionContextRepository : IAppSessionContextRepository
 
 public interface IAppSessionContextRepository
 {
-    AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true);
+    AppSessionData<AppUserIdentity> GetUserDataFromSession(bool excludeDetails = true, bool refreshBeforeExpiry= false);
     void ClearCurrentUserDataFromSession();
 }

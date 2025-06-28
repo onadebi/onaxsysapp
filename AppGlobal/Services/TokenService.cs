@@ -25,7 +25,7 @@ public class TokenService
     }
 
 
-    public string? CreateAppToken(AppUserIdentity user, out List<Claim> userClaims, int expireInMins = 15)
+    public string? CreateAppToken(AppUserIdentity user, out List<Claim> userClaims, int expireInMins = 5)
     {
         string? objResp = null;
         var claims = new List<Claim>
@@ -149,7 +149,7 @@ public class TokenService
 
                                 context.Response.Cookies.Append(_appSettings.SessionConfig.Auth.token, prolongedToken!, new CookieOptions()
                                 {
-                                    Expires = DateTime.Now.AddMinutes(_appSettings.SessionConfig.Auth.ExpireMinutes),
+                                    Expires = DateTime.UtcNow.AddMinutes(_appSettings.SessionConfig.Auth.ExpireMinutes),
                                     HttpOnly = _appSettings.SessionConfig.Auth.HttpOnly,
                                     Secure = _appSettings.SessionConfig.Auth.Secure,
                                     IsEssential = _appSettings.SessionConfig.Auth.IsEssential,
