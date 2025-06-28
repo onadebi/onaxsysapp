@@ -28,6 +28,8 @@ public class Transactions: CommonEntity
 
     public string? Plan { get; set; }
 
+    public bool CompletionStatus { get; set; }
+
     #region Navigation properties
     public TransactionsPlatform? TransactionsPlatform { get; set; }
     public UserProfile? UserProfileGuid { get; set; }

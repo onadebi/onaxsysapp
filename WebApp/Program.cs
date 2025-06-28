@@ -1,5 +1,6 @@
 using AppCore.Persistence.ModelBuilders;
-using Hangfire.Logging;
+using Hangfire;
+using Hangfire.Dashboard;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
@@ -98,6 +99,13 @@ app.Use(async (context, next) =>
 });
 
 app.MapHub<AppNotificationHub>("/notificationshub");
+
+#region Hangfire dashboard
+app.UseHangfireDashboard("/hangfire", new Hangfire.DashboardOptions
+{
+    Authorization = new[] { new Hangfire.Dashboard.LocalRequestsOnlyAuthorizationFilter() }
+});
+#endregion
 
 app.MapControllerRoute(
     name: "default",
