@@ -60,7 +60,7 @@ stages:
         SonarQube: 'onax-sonarcloud-io'
         organization: 'onax-sonarcloud'
         scannerMode: 'dotnet'
-        dotnetScannerVersion: '9.2.1'
+        dotnetScannerVersion: '9.2.1.110358'
         projectKey: 'onaxsys_onaxsysapp'
         projectName: 'onaxsysapp'
 
