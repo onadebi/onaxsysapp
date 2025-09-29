@@ -174,7 +174,7 @@ public static class ServiceExtensions
             c.EnableAnnotations();
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "OnaxApp APIs",
+                Title = "OnaxApp APIs Doc",
                 Version = "1.0.0",
                 Contact = new OpenApiContact { Email = "", Name = "OnaxApp" }
             });
