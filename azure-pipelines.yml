@@ -53,16 +53,16 @@ stages:
     - checkout: self
       fetchDepth: 0
 
-    # SonarCloud - Prepare Analysis Configuration
-    - task: SonarCloudPrepare@3
-      displayName: 'Prepare SonarCloud Analysis'
-      inputs:
-        SonarQube: 'onax-sonarcloud-io'
-        organization: 'onax-sonarcloud'
-        scannerMode: 'dotnet'
-        dotnetScannerVersion: '9.2.1.110358'
-        projectKey: 'onaxsys_onaxsysapp'
-        projectName: 'onaxsysapp'
+    # # SonarCloud - Prepare Analysis Configuration
+    # - task: SonarCloudPrepare@3
+    #   displayName: 'Prepare SonarCloud Analysis'
+    #   inputs:
+    #     SonarQube: 'onax-sonarcloud-io'
+    #     organization: 'onax-sonarcloud'
+    #     scannerMode: 'dotnet'
+    #     dotnetScannerVersion: '9.2.1.110358'
+    #     projectKey: 'onaxsys_onaxsysapp'
+    #     projectName: 'onaxsysapp'
 
     - task: UseDotNet@2
       inputs:
@@ -114,9 +114,9 @@ stages:
       workingDirectory: $(WORKING_DIRECTORY_SERVER)
       displayName: 'Build Server App'    # Publishing to Azure Web App
 
-    # SonarCloud - Run Code Analysis (must be after build)
-    - task: SonarCloudAnalyze@3
-      displayName: 'Run SonarCloud Code Analysis'
+    # # SonarCloud - Run Code Analysis (must be after build)
+    # - task: SonarCloudAnalyze@3
+    #   displayName: 'Run SonarCloud Code Analysis'
 
     - script: |
         set -e
@@ -132,10 +132,10 @@ stages:
       displayName: 'Publish Artifacts'
     # Add Docker build/push steps as needed for main branch
 
-    - task: SonarCloudPublish@3
-      displayName: 'Publish SonarCloud Quality Gate Result'
-      inputs:
-        pollingTimeoutSec: '300'
+    # - task: SonarCloudPublish@3
+    #   displayName: 'Publish SonarCloud Quality Gate Result'
+    #   inputs:
+    #     pollingTimeoutSec: '300'
 
 - stage: SetRemoteEnvVars
   # dependsOn: TestAndBuildApp
