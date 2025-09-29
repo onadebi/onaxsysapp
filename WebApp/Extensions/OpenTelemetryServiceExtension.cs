@@ -19,8 +19,8 @@ public static class OpenTelemetryServiceExtension
         builder.Configuration.AddAzureKeyVault(
             new Uri(AzKeyVaultKeyVaultUrl),
             new ClientSecretCredential(
-                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:TenantId")!,
-                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ClientId")!,
+                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:VaultDirectoryTenantId")!,
+                builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ApplicationClientId")!,
                 AzKeyVaultClientSecret
             )
         );

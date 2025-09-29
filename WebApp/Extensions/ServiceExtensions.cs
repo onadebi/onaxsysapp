@@ -41,8 +41,8 @@ public static class ServiceExtensions
         builder.Configuration.AddAzureKeyVault(
             new Uri(AzKeyVaultKeyVaultUrl),
             new ClientSecretCredential(
-                tenantId: builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:TenantId")!,
-                clientId: builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ClientId")!,
+                tenantId: builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:VaultDirectoryTenantId")!,
+                clientId: builder.Configuration.GetValue<string>("AppSettings:AzKeyVault:ApplicationClientId")!,
                 clientSecret: AzKeyVaultClientSecret
             ),
             new Azure.Extensions.AspNetCore.Configuration.Secrets.AzureKeyVaultConfigurationOptions
