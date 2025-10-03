@@ -1,33 +1,34 @@
-﻿using AppCore.Persistence;
+﻿using AppCore.Config;
+using AppCore.GenericRepo;
+using AppCore.Persistence;
+using AppCore.Services.Blog;
+using AppCore.Services.Common;
+using AppCore.Services.Helpers;
 using AppGlobal.Config;
+using AppGlobal.Config.Communication;
+using AppGlobal.Services;
 using AppGlobal.Services.Common.DbAccess;
 using AppGlobal.Services.DbAccess;
-using AppGlobal.Services;
-using Microsoft.Extensions.Options;
-using OnaxTools.Services.StackExchangeRedis.Interface;
-using WebApp.Helpers;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.EntityFrameworkCore;
-using AppCore.Services.Blog;
+using AppGlobal.Services.Logger;
 using AppGlobal.Services.PubSub;
-using AppGlobal.Config.Communication;
-using System.Text.Json;
-using AppCore.Config;
 using AutoMapper;
+using Azure.Identity;
 using Hangfire;
 using Hangfire.PostgreSql;
+using Microsoft.ApplicationInsights;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
+using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OnaxTools.Enums.Http;
-using AppGlobal.Services.Logger;
-using AppCore.Services.Helpers;
-using Microsoft.Extensions.Primitives;
-using AppCore.Services.Common;
+using OnaxTools.Services.StackExchangeRedis.Interface;
+using System.Text;
+using System.Text.Json;
+using WebApp.Helpers;
 using WebApp.Hubs;
-using Azure.Identity;
-using Microsoft.ApplicationInsights;
 
 namespace WebApp.Extensions;
 
@@ -365,6 +366,9 @@ public static class ServiceExtensions
         services.AddScoped<ISpeechService, SpeechService>();
         services.AddScoped<IAppSessionContextRepository, AppSessionContextRepository>();
         services.AddScoped<IFileManagerHelperService, FileManagerHelperService>();
+
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.AddScoped<IGeminiService>((svcProv) =>
         {

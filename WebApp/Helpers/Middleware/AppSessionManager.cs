@@ -19,7 +19,7 @@ public class AppSessionManager
     {
 
         var userSession = appSessionContextRepository.GetUserDataFromSession(excludeDetails: true, true);
-        context.Request.Cookies.TryGetValue(AppConstants.CookieUserId, out string cookieValue);
+        context.Request.Cookies.TryGetValue(AppConstants.CookieUserId, out string? cookieValue);
         IEnumerable<Claim> userRole = context.User.FindAll(claim => claim.Type == ClaimTypes.Role);
         if (string.IsNullOrWhiteSpace(cookieValue) && !userRole.Any())
         {
